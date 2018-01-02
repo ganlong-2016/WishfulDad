@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_guide_page3"
+        android:scaleType="fitXY"/>
+    <LinearLayout
+        android:id="@+id/layout_start"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:background="@drawable/shape_circle_white_stroke"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开启精彩奶爸生活"
+            android:textColor="#e681a3"
+            />
+        <ImageView
+            android:layout_marginStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_right_arrow_pink"/>
+    </LinearLayout>
+
+</RelativeLayout>

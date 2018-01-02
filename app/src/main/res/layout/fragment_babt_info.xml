@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f0f0f0"
+    android:orientation="vertical">
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="86dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/ic_oval_blue" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_alignTop="@+id/imageView2"
+            android:layout_toLeftOf="@+id/imageView2"
+            android:src="@drawable/ic_oval_red" />
+
+        <com.drkj.wishfuldad.view.RoundImageView
+            android:id="@+id/baby_head_image_view1"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_xiang_ji" />
+
+        <RelativeLayout
+            android:id="@+id/sex_layout"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="13dp"
+            android:layout_marginRight="72dp"
+            android:background="@drawable/ic_sex_background"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/sex_textview_gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#fff" />
+        </RelativeLayout>
+        <EditText
+            android:id="@+id/edit_baby_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:background="@null"
+            android:maxLines="1"
+            android:text="Lucas"
+            android:textColor="#000"
+            android:textSize="20sp"
+            android:textStyle="normal" />
+    </RelativeLayout>
+    <!--<include layout="@layout/view_baby_head"/>-->
+
+    <TextView
+        android:id="@+id/text_birth_day"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:background="@drawable/shadom_corner_background"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="请选择出生日期"
+        android:textColor="#333"
+        android:textSize="15sp"
+        android:drawableRight="@drawable/ic_arror"/>
+
+    <RelativeLayout
+        android:layout_width="220dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        >
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shadom_corner_background"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/text_blood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="血型:请选择"
+                android:textSize="15sp"
+                android:textColor="#333"/>
+            <TextView
+                android:id="@+id/text_sex"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="性别:请选择"
+                android:textSize="15sp"
+                android:textColor="#333"/>
+            <TextView
+                android:id="@+id/text_height"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="身高:请选择"
+                android:textSize="15sp"
+                android:textColor="#333"/>
+            <TextView
+                android:id="@+id/text_weight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:text="体重:请选择"
+                android:textSize="15sp"
+                android:textColor="#333"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/image_set_baby_info"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/ic_group_config"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
+</LinearLayout>
