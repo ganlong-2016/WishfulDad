@@ -51,16 +51,7 @@
 
 
         </RelativeLayout>
-        <TextView
-            android:id="@+id/text_save"
-            android:layout_width="70dp"
-            android:layout_height="45dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:text="保存"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#fFfFfF" />
+
     </RelativeLayout>
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager_baby_info"

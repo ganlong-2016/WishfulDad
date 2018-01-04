@@ -2,6 +2,7 @@ package com.drkj.wishfuldad.activity;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -19,10 +20,15 @@ import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.provider.Settings;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,6 +46,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -101,12 +108,15 @@ public class CardActivity extends BaseActivity {
     @BindView(R.id.text_distance)
     TextView distanceText;
     @BindView(R.id.text_pee_times)
-    TextView peeTimes;
+    TextView peeTimesText;
     @BindView(R.id.text_tibei_times)
-    TextView tibeiTimes;
+    TextView tibeiTimesText;
     @BindView(R.id.image_power)
     ImageView powerImage;
+    @BindView(R.id.image_roundImage_head)
+    ImageView roundHead;
     private Timer timer;
+    private CountDownTimer timer2;
     private TimerTask task;
     private boolean distance = false;
     private boolean tibei = false;
@@ -115,6 +125,20 @@ public class CardActivity extends BaseActivity {
     private SoundPool Cry0;
     private SoundPool Cry1;
     private SoundPool Cry2;
+
+    @BindView(R.id.switch_tibei)
+    Switch tibeiSwitch;
+    @BindView(R.id.switch_liju)
+    Switch distanceSwitch;
+
+    private boolean distanceHint = false;
+    private boolean tibeiHint = false;
+    private boolean isForeground;
+
+    private int peeTimes = 0;
+    private int tibeiTimes = 0;
+
+    private boolean isManualClose = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,11 +154,22 @@ public class CardActivity extends BaseActivity {
         Cry1.load(this, R.raw.cry1, 1);
         Cry2 = new SoundPool(1, AudioManager.STREAM_SYSTEM, 5);
         Cry2.load(this, R.raw.cry2, 1);
+
+        BleManager.getInstance().init(getApplication());
+        BleManager.getInstance()
+                .enableLog(true)
+                .setMaxConnectCount(7)
+                .setOperateTimeout(5000);
+        BleScanRuleConfig scanRuleConfig = new BleScanRuleConfig.Builder()
+                .setScanTimeOut(10000)              // 扫描超时时间，可选，默认10秒；小于等于0表示不限制扫描时间
+                .build();
+        BleManager.getInstance().initScanRule(scanRuleConfig);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        isForeground = true;
         mBabyName.setText(BaseApplication.getInstance().getBabyInfo().getName());
         String imageUrlPath = BaseApplication.getInstance().getBabyInfo().getHeadImage();
         if (!TextUtils.isEmpty(imageUrlPath)) {
@@ -142,7 +177,9 @@ public class CardActivity extends BaseActivity {
             try {
                 fis = new FileInputStream(imageUrlPath);
                 Bitmap bitmap = BitmapFactory.decodeStream(fis);
-                mImageHead.setImageBitmap(bitmap);
+                Bitmap bitmap1 = blur(bitmap, 9);
+                mImageHead.setImageBitmap(bitmap1);
+                roundHead.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -175,10 +212,230 @@ public class CardActivity extends BaseActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        isForeground = false;
+    }
+
+    private Bitmap blur(Bitmap sentBitmap, int radius) {
+//        Bitmap output = Bitmap.createBitmap(bitmap); // 创建输出图片
+//        RenderScript rs = RenderScript.create(this); // 构建一个RenderScript对象
+//        ScriptIntrinsicBlur gaussianBlue = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs)); // 创建高斯模糊脚本
+//        Allocation allIn = Allocation.createFromBitmap(rs, bitmap); // 创建用于输入的脚本类型
+//        Allocation allOut = Allocation.createFromBitmap(rs, output); // 创建用于输出的脚本类型
+//        gaussianBlue.setRadius(radius); // 设置模糊半径，范围0f<radius<=25f
+//        gaussianBlue.setInput(allIn); // 设置输入脚本类型
+//        gaussianBlue.forEach(allOut); // 执行高斯模糊算法，并将结果填入输出脚本类型中
+//        allOut.copyTo(output); // 将输出内存编码为Bitmap，图片大小必须注意
+//        rs.destroy(); // 关闭RenderScript对象，API>=23则使用rs.releaseAllContexts()
+//        return output;
+        Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
+
+        if (radius < 1) {
+            return (null);
+        }
+
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        int[] pix = new int[w * h];
+        bitmap.getPixels(pix, 0, w, 0, 0, w, h);
+
+        int wm = w - 1;
+        int hm = h - 1;
+        int wh = w * h;
+        int div = radius + radius + 1;
+
+        int r[] = new int[wh];
+        int g[] = new int[wh];
+        int b[] = new int[wh];
+        int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
+        int vmin[] = new int[Math.max(w, h)];
+
+        int divsum = (div + 1) >> 1;
+        divsum *= divsum;
+        int temp = 256 * divsum;
+        int dv[] = new int[temp];
+        for (i = 0; i < temp; i++) {
+            dv[i] = (i / divsum);
+        }
+
+        yw = yi = 0;
+
+        int[][] stack = new int[div][3];
+        int stackpointer;
+        int stackstart;
+        int[] sir;
+        int rbs;
+        int r1 = radius + 1;
+        int routsum, goutsum, boutsum;
+        int rinsum, ginsum, binsum;
+
+        for (y = 0; y < h; y++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            for (i = -radius; i <= radius; i++) {
+                p = pix[yi + Math.min(wm, Math.max(i, 0))];
+                sir = stack[i + radius];
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = (p & 0x0000ff);
+                rbs = r1 - Math.abs(i);
+                rsum += sir[0] * rbs;
+                gsum += sir[1] * rbs;
+                bsum += sir[2] * rbs;
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+            }
+            stackpointer = radius;
+
+            for (x = 0; x < w; x++) {
+
+                r[yi] = dv[rsum];
+                g[yi] = dv[gsum];
+                b[yi] = dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - radius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (y == 0) {
+                    vmin[x] = Math.min(x + radius + 1, wm);
+                }
+                p = pix[yw + vmin[x]];
+
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = (p & 0x0000ff);
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[(stackpointer) % div];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi++;
+            }
+            yw += w;
+        }
+        for (x = 0; x < w; x++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            yp = -radius * w;
+            for (i = -radius; i <= radius; i++) {
+                yi = Math.max(0, yp) + x;
+
+                sir = stack[i + radius];
+
+                sir[0] = r[yi];
+                sir[1] = g[yi];
+                sir[2] = b[yi];
+
+                rbs = r1 - Math.abs(i);
+
+                rsum += r[yi] * rbs;
+                gsum += g[yi] * rbs;
+                bsum += b[yi] * rbs;
+
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+
+                if (i < hm) {
+                    yp += w;
+                }
+            }
+            yi = x;
+            stackpointer = radius;
+            for (y = 0; y < h; y++) {
+                pix[yi] = (0xff000000 & pix[yi]) | (dv[rsum] << 16)
+                        | (dv[gsum] << 8) | dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - radius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (x == 0) {
+                    vmin[y] = Math.min(y + r1, hm) * w;
+                }
+                p = x + vmin[y];
+
+                sir[0] = r[p];
+                sir[1] = g[p];
+                sir[2] = b[p];
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[stackpointer];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi += w;
+            }
+        }
+
+        bitmap.setPixels(pix, 0, w, 0, 0, w, h);
+        return (bitmap);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (timer != null)
             timer.cancel();
+        if (timer2!=null)
+            timer2.cancel();
     }
 
     private void apply() {
@@ -281,12 +538,18 @@ public class CardActivity extends BaseActivity {
             case R.id.switch_tibei:
                 MobclickAgent.onEvent(this, "tickSwitch");
                 tibei = isChecked;
-                if (isChecked)
-                    showDialog();
+                if (isChecked && !tibeiHint) {
+                    tibeiHint = true;
+                    showtibeiDialog();
+                }
                 break;
             case R.id.switch_liju:
                 MobclickAgent.onEvent(this, "distanceSwitch");
                 distance = isChecked;
+                if (isChecked && !distanceHint) {
+                    distanceHint = true;
+                    showDistanceDialog();
+                }
                 break;
             default:
                 break;
@@ -305,6 +568,8 @@ public class CardActivity extends BaseActivity {
             showDisConnectDialog(mDevice);
             return;
         }
+
+
         BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -312,19 +577,15 @@ public class CardActivity extends BaseActivity {
             if (!mBluetoothAdapter.isEnabled()) {
                 showDialog2();
             } else {
+                isManualClose = false;
+                if (timer2 != null) {
+                    timer2.cancel();
+                }
                 progressDialog = new ProgressDialog(this);
                 progressDialog.setMessage("蓝牙设备搜索中...");
                 progressDialog.setCancelable(false);
                 progressDialog.show();
-                BleManager.getInstance().init(getApplication());
-                BleManager.getInstance()
-                        .enableLog(true)
-                        .setMaxConnectCount(7)
-                        .setOperateTimeout(5000);
-                BleScanRuleConfig scanRuleConfig = new BleScanRuleConfig.Builder()
-                        .setScanTimeOut(10000)              // 扫描超时时间，可选，默认10秒；小于等于0表示不限制扫描时间
-                        .build();
-                BleManager.getInstance().initScanRule(scanRuleConfig);
+
                 BleManager.getInstance().scan(new BleScanCallback() {
                     @Override
                     public void onScanStarted(boolean success) {
@@ -345,8 +606,8 @@ public class CardActivity extends BaseActivity {
                                 devices.add(device);
                             }
                         }
-                        if (devices.size() > 0)
-                            showDeviceDialog(devices);
+
+                        showDeviceDialog(devices);
                     }
                 });
             }
@@ -354,11 +615,12 @@ public class CardActivity extends BaseActivity {
 
     }
 
-    private void showDialog() {
+    private void showtibeiDialog() {
         final Dialog dialog = new Dialog(this, R.style.MyDialog);
-        dialog.setContentView(R.layout.dialog_hint);
-        TextView textOK = dialog.findViewById(R.id.text_cancel);
+        dialog.setContentView(R.layout.dialog_hint2);
+        TextView textOK = dialog.findViewById(R.id.text_ok);
         textOK.setTextColor(getResources().getColor(R.color.blue));
+        textOK.setText("确认");
         textOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -367,8 +629,49 @@ public class CardActivity extends BaseActivity {
                 }
             }
         });
+        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+        textCancel.setText("取消");
+        textCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                tibeiSwitch.setChecked(false);
+            }
+        });
         TextView message = dialog.findViewById(R.id.text_message);
-        message.setText("请在宝宝起床后，注意关闭踢被开关\n这能使踢被预测数据更准确");
+        message.setText("奶爸听差将开启踢被检查模式,\n请确认宝宝已盖好被子");
+        dialog.show();
+    }
+
+    private void showDistanceDialog() {
+        final Dialog dialog = new Dialog(this, R.style.MyDialog);
+        dialog.setContentView(R.layout.dialog_hint2);
+        TextView textOK = dialog.findViewById(R.id.text_ok);
+        textOK.setTextColor(getResources().getColor(R.color.blue));
+        textOK.setText("确认");
+        textOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+        textCancel.setText("取消");
+        textCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                distanceSwitch.setChecked(false);
+            }
+        });
+        TextView message = dialog.findViewById(R.id.text_message);
+        message.setText("奶爸听差将开启距离检查模式");
         dialog.show();
     }
 
@@ -384,7 +687,6 @@ public class CardActivity extends BaseActivity {
                     dialog.dismiss();
                 }
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                Intent enableBtIntent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                 enableBtIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(enableBtIntent);
             }
@@ -419,44 +721,51 @@ public class CardActivity extends BaseActivity {
         deviceDialog.setContentView(R.layout.dialog_show_device);
         deviceDialog.setCancelable(true);
         ListView view = deviceDialog.findViewById(R.id.list_device);
-        view.setAdapter(new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return devices.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return devices.get(position);
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                if (convertView == null) {
-                    convertView = LayoutInflater.from(CardActivity.this).inflate(R.layout.item_devices, null);
+        RelativeLayout layout = deviceDialog.findViewById(R.id.layout_nodata);
+        if (devices.size() > 0) {
+            view.setVisibility(View.VISIBLE);
+            layout.setVisibility(View.GONE);
+            view.setAdapter(new BaseAdapter() {
+                @Override
+                public int getCount() {
+                    return devices.size();
                 }
-                TextView textView = convertView.findViewById(R.id.text_device_name);
-                textView.setText(devices.get(position).getName());
-                return convertView;
-            }
-        });
-        view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MobclickAgent.onEvent(CardActivity.this, "bluetoothChoose");
-                progressDialog = new ProgressDialog(CardActivity.this);
-                progressDialog.setMessage("设备连接中...");
-                progressDialog.show();
-                connect(devices.get(position));
 
+                @Override
+                public Object getItem(int position) {
+                    return devices.get(position);
+                }
 
-            }
-        });
+                @Override
+                public long getItemId(int position) {
+                    return position;
+                }
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    if (convertView == null) {
+                        convertView = LayoutInflater.from(CardActivity.this).inflate(R.layout.item_devices, null);
+                    }
+                    TextView textView = convertView.findViewById(R.id.text_device_name);
+                    textView.setText(devices.get(position).getName());
+                    return convertView;
+                }
+            });
+            view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MobclickAgent.onEvent(CardActivity.this, "bluetoothChoose");
+                    progressDialog = new ProgressDialog(CardActivity.this);
+                    progressDialog.setMessage("设备连接中...");
+                    progressDialog.show();
+                    connect(devices.get(position));
+                }
+            });
+        } else {
+            view.setVisibility(View.GONE);
+            layout.setVisibility(View.VISIBLE);
+        }
+
         deviceDialog.show();
     }
 
@@ -500,78 +809,98 @@ public class CardActivity extends BaseActivity {
         }
     };
 
+    BleGattCallback callback = new BleGattCallback() {
+        @Override
+        public void onStartConnect() {
+
+        }
+
+        @Override
+        public void onConnectFail(BleException exception) {
+            progressDialog.dismiss();
+            showToast("连接失败");
+        }
+
+        @Override
+        public void onConnectSuccess(final BleDevice bleDevice, BluetoothGatt gatt, int status) {
+            if (timer2!=null)
+                timer2.cancel();
+            mDevice = bleDevice;
+            progressDialog.dismiss();
+            deviceDialog.dismiss();
+            mBluetooth.setImageResource(R.drawable.ic_bluetooth_connect);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            startNotify(bleDevice);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            write(bleDevice, SampleGattAttributes.XXB_CH);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            write(bleDevice, SampleGattAttributes.XXB_XX_OK);
+            int a = BaseApplication.getInstance().getSettingInfo().getWeatherType();
+            switch (a) {
+                case 0:
+                    write(mDevice, SampleGattAttributes.XXB_TQ0);
+                    break;
+                case 1:
+                    write(mDevice, SampleGattAttributes.XXB_TQ2);
+                    break;
+                case 2:
+                    write(mDevice, SampleGattAttributes.XXB_TQ1);
+                    break;
+                default:
+                    break;
+            }
+            timer = new Timer();
+            task = new TimerTask() {
+                @Override
+                public void run() {
+                    Message message = Message.obtain();
+                    message.obj = bleDevice;
+                    message.what = 12345;
+                    handler.sendMessage(message);
+                }
+            };
+            timer.schedule(task, 0, 5000);
+        }
+
+        @Override
+        public void onDisConnected(boolean isActiveDisConnected, final BleDevice device, BluetoothGatt gatt, int status) {
+            mBluetooth.setImageResource(R.drawable.ic_bluetooth_unconnect);
+            timer.cancel();
+            if (isManualClose)
+                clearData();
+            else {
+                timer2 = new CountDownTimer(600000,10000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        connect(device);
+                        Log.i(TAG, "onTick: 自动重连");
+                    }
+
+                    @Override
+                    public void onFinish() {
+
+                    }
+                };
+                timer2.start();
+            }
+
+        }
+    };
     private void connect(final BleDevice device) {
         if (!BleManager.getInstance().isConnected(device)) {
-            BleManager.getInstance().connect(device, new BleGattCallback() {
-                @Override
-                public void onStartConnect() {
-
-                }
-
-                @Override
-                public void onConnectFail(BleException exception) {
-                    progressDialog.dismiss();
-                    showToast("连接失败");
-                }
-
-                @Override
-                public void onConnectSuccess(final BleDevice bleDevice, BluetoothGatt gatt, int status) {
-                    mDevice = bleDevice;
-                    progressDialog.dismiss();
-                    deviceDialog.dismiss();
-                    mBluetooth.setImageResource(R.drawable.ic_bluetooth_connect);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    startNotify(bleDevice);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    write(bleDevice, SampleGattAttributes.XXB_CH);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    write(bleDevice, SampleGattAttributes.XXB_XX_OK);
-                    int a = BaseApplication.getInstance().getSettingInfo().getWeatherType();
-                    switch (a) {
-                        case 0:
-                            write(mDevice, SampleGattAttributes.XXB_TQ0);
-                            break;
-                        case 1:
-                            write(mDevice, SampleGattAttributes.XXB_TQ2);
-                            break;
-                        case 2:
-                            write(mDevice, SampleGattAttributes.XXB_TQ1);
-                            break;
-                        default:
-                            break;
-                    }
-                    timer = new Timer();
-                    task = new TimerTask() {
-                        @Override
-                        public void run() {
-                            Message message = Message.obtain();
-                            message.obj = bleDevice;
-                            message.what = 12345;
-                            handler.sendMessage(message);
-                        }
-                    };
-                    timer.schedule(task, 0, 5000);
-                }
-
-                @Override
-                public void onDisConnected(boolean isActiveDisConnected, BleDevice device, BluetoothGatt gatt, int status) {
-                    mBluetooth.setImageResource(R.drawable.ic_bluetooth_unconnect);
-                    timer.cancel();
-                    clearData();
-                }
-            });
+            BleManager.getInstance().connect(device,callback);
         }
 
     }
@@ -581,9 +910,11 @@ public class CardActivity extends BaseActivity {
         temperatureProgress.setProgress(0);
         humidityText.setText("0");
         humidityProgress.setProgress(0);
-        peeTimes.setText("0");
-        tibeiTimes.setText("0");
+        peeTimesText.setText("0");
+        tibeiTimesText.setText("0");
         distanceText.setText("0");
+        peeTimes = 0;
+        tibeiTimes = 0;
     }
 
     void startNotify(BleDevice device) {
@@ -627,7 +958,8 @@ public class CardActivity extends BaseActivity {
         if (data.length == 8) {
             if (data[4] == 84 && data[5] == 66) {
                 if (tibei) {
-                    tibeiTimes.setText(data[7] + "");
+                    tibeiTimes++;
+                    tibeiTimesText.setText(tibeiTimes + "");
                     notice();
                     noticeTibei();
                 }
@@ -635,7 +967,8 @@ public class CardActivity extends BaseActivity {
                 DbController.getInstance().insertData(DataBean.TYPE_TIBEI, stamp);
             }
             if (data[4] == 78 && data[5] == 78) {
-                peeTimes.setText(data[7] + "");
+                peeTimes++;
+                peeTimesText.setText(peeTimes + "");
                 long stamp = System.currentTimeMillis();
                 DbController.getInstance().insertData(DataBean.TYPE_PEE, stamp);
                 notice();
@@ -701,14 +1034,17 @@ public class CardActivity extends BaseActivity {
     }
 
     private void noticeTibei() {
-        if (!isForeground(this, "CardActivity")) {
-            notification(BaseApplication.getInstance().getBabyInfo().getName() + "踢被子了!请注意为宝宝盖好被子!");
+        if (!isForeground) {
+            notification(BaseApplication.getInstance().getBabyInfo().getName() + "踢被子了!请注意为宝宝盖好被子!", 1);
         }
         final Dialog dialog = new Dialog(this, R.style.MyDialog);
-        dialog.setContentView(R.layout.dialog_hint);
+        dialog.setContentView(R.layout.popwindos_alert);
+        dialog.findViewById(R.id.pee_alert_layout).setVisibility(View.GONE);
+        dialog.findViewById(R.id.distance_alert_layout).setVisibility(View.GONE);
+        dialog.findViewById(R.id.pee_alert_confirm_layout).setVisibility(View.GONE);
         TextView textMeassge = dialog.findViewById(R.id.text_message);
         textMeassge.setText(BaseApplication.getInstance().getBabyInfo().getName() + "踢被子了!请注意为宝宝盖好被子!");
-        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+        TextView textCancel = dialog.findViewById(R.id.confirm_textview);
         textCancel.setText("好的");
         textCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -719,16 +1055,17 @@ public class CardActivity extends BaseActivity {
             }
         });
         dialog.show();
-
-
     }
 
     private void noticePee() {
-        if (!isForeground(this, "CardActivity")) {
-            notification(BaseApplication.getInstance().getBabyInfo().getName() + "尿尿了!请注意更换纸尿裤!");
+        if (!isForeground) {
+            notification(BaseApplication.getInstance().getBabyInfo().getName() + "尿尿了!请注意更换纸尿裤!", 2);
         }
         final Dialog dialog = new Dialog(this, R.style.MyDialog);
-        dialog.setContentView(R.layout.dialog_hint2);
+        dialog.setContentView(R.layout.popwindos_alert);
+        dialog.findViewById(R.id.distance_alert_layout).setVisibility(View.GONE);
+        dialog.findViewById(R.id.kick_alert_layout).setVisibility(View.GONE);
+        dialog.findViewById(R.id.kick_alert_confirm_layout).setVisibility(View.GONE);
         TextView textOK = dialog.findViewById(R.id.text_ok);
         TextView textMeassge = dialog.findViewById(R.id.text_message);
         textMeassge.setText(BaseApplication.getInstance().getBabyInfo().getName() + "尿尿了!请注意更换纸尿裤");
@@ -759,18 +1096,20 @@ public class CardActivity extends BaseActivity {
 
         dialog.show();
 
-
     }
 
     private void noticeDistance() {
-        if (!isForeground(this, "CardActivity")) {
-            notification(BaseApplication.getInstance().getBabyInfo().getName() + "离开了安全距离,请注意宝宝动向!");
+        if (!isForeground) {
+            notification(BaseApplication.getInstance().getBabyInfo().getName() + "离开了安全距离,请注意宝宝动向!", 3);
         }
         final Dialog dialog = new Dialog(this, R.style.MyDialog);
-        dialog.setContentView(R.layout.dialog_hint);
+        dialog.setContentView(R.layout.popwindos_alert);
+        dialog.findViewById(R.id.pee_alert_layout).setVisibility(View.GONE);
+        dialog.findViewById(R.id.kick_alert_layout).setVisibility(View.GONE);
+        dialog.findViewById(R.id.pee_alert_confirm_layout).setVisibility(View.GONE);
         TextView textMeassge = dialog.findViewById(R.id.text_message);
         textMeassge.setText(BaseApplication.getInstance().getBabyInfo().getName() + "离开了安全距离,请注意宝宝动向!");
-        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+        TextView textCancel = dialog.findViewById(R.id.confirm_textview);
         textCancel.setText("好的");
         textCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -781,7 +1120,6 @@ public class CardActivity extends BaseActivity {
             }
         });
         dialog.show();
-
 
     }
 
@@ -799,6 +1137,7 @@ public class CardActivity extends BaseActivity {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
+                isManualClose = true;
                 BleManager.getInstance().disconnect(device);
             }
         });
@@ -816,21 +1155,29 @@ public class CardActivity extends BaseActivity {
         dialog.show();
     }
 
-    private void notification(String message) {
+    private void notification(String message, int id) {
         //获取NotificationManager实例
         NotificationManager notifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         //获取PendingIntent
         Intent mainIntent = new Intent(this, CardActivity.class);
         PendingIntent mainPendingIntent = PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //创建 Notification.Builder 对象
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "abc")
+//        //创建 Notification.Builder 对象
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "abc")
+//                .setSmallIcon(R.drawable.ic_logo)
+//                //点击通知后自动清除
+//                .setAutoCancel(true)
+//                .setContentText(message)
+//                .setContentIntent(mainPendingIntent);
+//        //发送通知
+//        notifyManager.notify(3, builder.build());
+        Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_logo)
-                //点击通知后自动清除
                 .setAutoCancel(true)
+                .setContentTitle("奶爸听差")
                 .setContentText(message)
-                .setContentIntent(mainPendingIntent);
-        //发送通知
-        notifyManager.notify(3, builder.build());
+                .setContentIntent(mainPendingIntent)
+                .build();
+        notifyManager.notify(id, notification);
 
     }
 }

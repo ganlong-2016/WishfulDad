@@ -41,7 +41,7 @@ public class DataLayout extends ViewGroup {
 
     private void initChild(){
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        dataView = new DataView(getContext());
+        dataView = new DataView(getContext(),this);
         dataView.setLayoutParams(layoutParams);
         addView(dataView);
         //设置ViewGroup可画
@@ -111,5 +111,9 @@ public class DataLayout extends ViewGroup {
 
     public void setData(List<TibeiDataBean> list){
         dataView.setData(list);
+    }
+
+    public void scroll(int x,int y){
+
     }
 }

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.drkj.wishfuldad.BaseApplication;
 import com.drkj.wishfuldad.bean.BabyInfo;
 import com.drkj.wishfuldad.bean.DataBean;
+import com.drkj.wishfuldad.bean.MessageInfo;
 import com.drkj.wishfuldad.bean.SettingInfo;
 import com.drkj.wishfuldad.bean.YourInfo;
 
@@ -151,5 +152,27 @@ public class DbController {
         values.put("type",type);
         values.put("time_stamp",timeStamp);
         db.insert(DbConstant.DATA_TABLE_NAME,null,values);
+    }
+
+    public List<MessageInfo> queryChatData(){
+        List<MessageInfo> beans = new ArrayList<>();
+        SQLiteDatabase db = sqlHelper.getReadableDatabase();
+        Cursor cursor = db.query(DbConstant.CHAT_DATA_TABLE_NAME, null, null, null, null, null, null);
+        if (cursor.moveToFirst()){
+            while (cursor.moveToNext()){
+                MessageInfo dataBean = new MessageInfo();
+                dataBean.setType(cursor.getInt(cursor.getColumnIndex("type")));
+                dataBean.setContent(cursor.getString(cursor.getColumnIndex("content")));
+                beans.add(dataBean);
+            }
+        }
+        return beans;
+    }
+    public void insertChatData(MessageInfo info){
+        SQLiteDatabase db = sqlHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("type",info.getType());
+        values.put("content",info.getContent());
+        db.insert(DbConstant.CHAT_DATA_TABLE_NAME,null,values);
     }
 }

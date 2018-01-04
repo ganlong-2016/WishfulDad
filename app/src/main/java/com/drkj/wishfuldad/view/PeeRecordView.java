@@ -32,8 +32,13 @@ public class PeeRecordView extends View {
     Paint rectPaint;
     Paint textPaint;
     Paint paint;
-    public PeeRecordView(Context context) {
+    PeeRecordLayout layout;
+    private int scrollx;
+    private int scrolly;
+    private boolean flag = true;
+    public PeeRecordView(Context context, PeeRecordLayout layout) {
         super(context);
+        this.layout = layout;
         initdatas();
     }
 
@@ -102,24 +107,31 @@ public class PeeRecordView extends View {
 
 //            canvas.drawText(i+"",50,(10-i)*50+100,paint);
 //        }
-        int h = canvas.getHeight()/10;
-        int w = canvas.getWidth()/5;
-
-        float textH = paint.descent()-paint.ascent();
-        for (int j= 0;j<days.size();j++){
+        int h = canvas.getHeight() / 10;
+        int w = canvas.getWidth() / 5;
+        int height = canvas.getHeight();
+        float textH = paint.descent() - paint.ascent();
+        for (int j = 0; j < days.size(); j++) {
 //            canvas.drawText(days.get(j), w / 2 + j * w, h / 2, paint);
-            canvas.drawLine(w / 2 + j * w, 0, w / 2 + j * w,24*h+textH,linePaint);
-            for (DataBean bean:data){
-                if (TextUtils.equals(bean.getDate(),days.get(j))){
+            canvas.drawLine(w / 2 + j * w, 0, w / 2 + j * w, 24 * h + textH, linePaint);
+            for (DataBean bean : data) {
+                if (TextUtils.equals(bean.getDate(), days.get(j))) {
                     String time = bean.getTime();
-                    String hour = time.substring(0,2);
+                    String hour = time.substring(0, 2);
                     String minute = time.substring(3);
                     int ho = Integer.parseInt(hour);
                     int min = Integer.parseInt(minute);
-                    canvas.drawRect(w / 2 + j * w-60,(ho)*h-25+textH+h/60*min,w / 2 + j * w+60,(ho)*h+25+textH+h/60*min,rectPaint);
-                    canvas.drawText(time,w / 2 + j * w,(ho)*h+15+textH+h/60*min,textPaint);
+                    canvas.drawRect(w / 2 + j * w - 60, (ho) * h - textH/2 + h / 60 * min, w / 2 + j * w + 60, (ho) * h  + textH/2 + h / 60 * min, rectPaint);
+                    canvas.drawText(time, w / 2 + j * w, (ho) * h  + textH/2 + h / 60 * min-5, textPaint);
+                    scrollx = w / 2 + j * w-canvas.getWidth()/2;
+                    scrolly = (int) (ho * h + 15 + textH + h / 60 * min) - height / 2;
                 }
             }
+        }
+        if (flag){
+            flag = false;
+            if (layout != null)
+                layout.scroll(scrollx, scrolly);
         }
     }
 
@@ -127,10 +139,11 @@ public class PeeRecordView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         mMinPositionX = 0;
-        mMaxPositionX = w/5*2;
+        mMaxPositionX = w / 5 * 2;
         mMinPositionY = 0;
-        mMaxPositionY = h/10*15;
+        mMaxPositionY = h / 10 * 15;
     }
+
     @Override
     public void scrollTo(int x, int y) {
         if (x < mMinPositionX) {
@@ -141,13 +154,13 @@ public class PeeRecordView extends View {
             x = mMaxPositionX;
             getParent().requestDisallowInterceptTouchEvent(false);
         }
-        if (y<mMinPositionY){
-            y=mMinPositionY;
+        if (y < mMinPositionY) {
+            y = mMinPositionY;
         }
-        if (y>mMaxPositionY){
-            y=mMaxPositionY;
+        if (y > mMaxPositionY) {
+            y = mMaxPositionY;
         }
-        if (x != getScrollX()||y!=getScrollY()) {
+        if (x != getScrollX() || y != getScrollY()) {
             super.scrollTo(x, y);
         }
     }
@@ -161,9 +174,11 @@ public class PeeRecordView extends View {
         this.days = days;
         invalidate();
     }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         getParent().requestDisallowInterceptTouchEvent(true);
         return super.dispatchTouchEvent(ev);
     }
+
 }

@@ -1,6 +1,5 @@
 package com.drkj.wishfuldad.activity;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -8,7 +7,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,13 +16,12 @@ import com.drkj.wishfuldad.R;
 import com.drkj.wishfuldad.db.DbController;
 import com.drkj.wishfuldad.fragment.BabyInfoFragment;
 import com.drkj.wishfuldad.fragment.BabySettingsFragment;
-import com.drkj.wishfuldad.listener.SettingBabyInfoListener;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BabyInfoActivity extends BaseActivity implements View.OnClickListener,SettingBabyInfoListener {
+public class BabyInfoActivity extends BaseActivity implements View.OnClickListener {
 
     private ViewPager viewPager;
     private PagerAdapter adapter;
@@ -35,7 +32,6 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
     private ImageView backImageView;
     private TextView babyInfoTextView;
     private TextView settingTextView;
-    private TextView saveTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +52,12 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
         settingTextView = findViewById(R.id.text_set);
         settingTextView.setOnClickListener(this);
 
-        saveTextView = findViewById(R.id.text_save);
-        saveTextView.setOnClickListener(this);
 
         viewPager = findViewById(R.id.viewPager_baby_info);
         infoFragment = new BabyInfoFragment();
-        infoFragment.addSettingBabyInfoListener(this);
+//        infoFragment.addSettingBabyInfoListener(this);
         settingsFragment = new BabySettingsFragment();
-        settingsFragment.addSettingBabyInfoListener(this);
+//        settingsFragment.addSettingBabyInfoListener(this);
         fragments.add(infoFragment);
         fragments.add(settingsFragment);
         adapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
@@ -114,7 +108,7 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            showPrompt();
+            saveData();
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -123,7 +117,8 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imageView_back:
-                showPrompt();
+                saveData();
+                finish();
                 break;
             case R.id.text_baby_info:
 
@@ -134,15 +129,7 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
                 MobclickAgent.onEvent(this, "set");
                 viewPager.setCurrentItem(1, true);
                 break;
-            case R.id.text_save:
-                MobclickAgent.onEvent(this, "editedBabyInfo");
-                childUpdate();
-                userIcon();
-                DbController.getInstance().updateBabyInfoData(BaseApplication.getInstance().getBabyInfo());
-                DbController.getInstance().updateSettingData(BaseApplication.getInstance().getSettingInfo());
 
-                finish();
-                break;
             default:
                 break;
         }
@@ -154,48 +141,52 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
 //        BaseApplication.getInstace().setBabyInfoBean(DbController.getInstance().queryBabyInfoData());
 //        BaseApplication.getInstace().setSettingsBean(DbController.getInstance().querySettingData());
     }
-
-    private void showPrompt() {
-
-        final Dialog dialog = new Dialog(this,R.style.MyDialog);
-        dialog.setContentView(R.layout.dialog_hint2);
-        TextView textOK = dialog.findViewById(R.id.text_ok);
-        TextView textMeassge = dialog.findViewById(R.id.text_message);
-        textMeassge.setText("您编辑的信息尚未保存,\n确认离开?");
-        textOK.setTextColor(getResources().getColor(R.color.blue));
-        textOK.setText("确定");
-        textOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-                BaseApplication.getInstance().setBabyInfo(DbController.getInstance().queryBabyInfoData());
-                BaseApplication.getInstance().setSettingInfo(DbController.getInstance().querySettingData());
-                finish();
-            }
-        });
-        TextView textCancel = dialog.findViewById(R.id.text_cancel);
-        textCancel.setText("取消");
-        textCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-            }
-        });
-
-        dialog.show();
+    private void saveData(){
+        childUpdate();
+        userIcon();
+        DbController.getInstance().updateBabyInfoData(BaseApplication.getInstance().getBabyInfo());
+        DbController.getInstance().updateSettingData(BaseApplication.getInstance().getSettingInfo());
     }
+//    private void showPrompt() {
+//        final Dialog dialog = new Dialog(this,R.style.MyDialog);
+//        dialog.setContentView(R.layout.dialog_hint2);
+//        TextView textOK = dialog.findViewById(R.id.text_ok);
+//        TextView textMeassge = dialog.findViewById(R.id.text_message);
+//        textMeassge.setText("您编辑的信息尚未保存,\n确认离开?");
+//        textOK.setTextColor(getResources().getColor(R.color.blue));
+//        textOK.setText("确定");
+//        textOK.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (dialog != null) {
+//                    dialog.dismiss();
+//                }
+//                BaseApplication.getInstance().setBabyInfo(DbController.getInstance().queryBabyInfoData());
+//                BaseApplication.getInstance().setSettingInfo(DbController.getInstance().querySettingData());
+//                finish();
+//            }
+//        });
+//        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+//        textCancel.setText("取消");
+//        textCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (dialog != null) {
+//                    dialog.dismiss();
+//                }
+//            }
+//        });
+//
+//        dialog.show();
+//    }
 
-    @Override
-    public void settingComplete(String imageUrlPath) {
-        settingsFragment.setBabyInfo(imageUrlPath);
-    }
-
-    @Override
-    public void setName(String name) {
-        settingsFragment.setBabyName(name);
-    }
+//    @Override
+//    public void settingComplete(String imageUrlPath) {
+//        settingsFragment.setBabyInfo(imageUrlPath);
+//    }
+//
+//    @Override
+//    public void setName(String name) {
+//        settingsFragment.setBabyName(name);
+//    }
 }

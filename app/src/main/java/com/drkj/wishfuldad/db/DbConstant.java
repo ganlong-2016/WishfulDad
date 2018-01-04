@@ -62,6 +62,7 @@ public class DbConstant {
                     "values (null,null,null,null)";
 
     public static final String DATA_TABLE_NAME = "data";
+
     public static final String CREATE_DATA_TABLE =
             "create table "+DATA_TABLE_NAME+
                     "(id int auto_increment primary key," +
@@ -69,4 +70,13 @@ public class DbConstant {
                     "time_stamp long"+
                     ")";
 
+    public static final String CHAT_DATA_TABLE_NAME = "chat_data";
+
+    public static final String CREATE_CHAT_DATA_TABLE =
+            "create table "+CHAT_DATA_TABLE_NAME+
+                    "(id int auto_increment primary key," +
+                    "type integer,"+
+                    "content text,"+
+                    "time_stamp long"+
+                    ")";
 }

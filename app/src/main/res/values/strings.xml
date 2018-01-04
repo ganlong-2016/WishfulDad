@@ -3,8 +3,8 @@
     <string name="your_info">您的基本信息</string>
     <string name="name">姓名</string>
     <string name="input_your_name">输入姓名</string>
-    <string name="age">年龄</string>
-    <string name="input_age">输入年龄</string>
+    <string name="age">生日</string>
+    <string name="input_age">选择生日</string>
     <string name="role">角色</string>
     <string name="papa">爸爸</string>
     <string name="mama">妈妈</string>

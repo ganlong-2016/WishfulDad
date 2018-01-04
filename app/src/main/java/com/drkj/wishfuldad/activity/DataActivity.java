@@ -129,6 +129,7 @@ public class DataActivity extends BaseActivity implements View.OnClickListener{
 
             }
         });
+        viewPager.setOffscreenPageLimit(3);
     }
 
     @Override

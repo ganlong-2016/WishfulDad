@@ -116,7 +116,7 @@ public class ChatViewAdapter extends BaseAdapter {
                 }
             }
         }
-        chatHolder.timeTextView.setText(list.get(position).getTime());
+//        chatHolder.timeTextView.setText(list.get(position).getTime());
         chatHolder.contentTextView.setText(list.get(position).getContent());
         return convertView;
     }

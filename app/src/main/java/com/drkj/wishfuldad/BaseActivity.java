@@ -39,7 +39,7 @@ import okhttp3.RequestBody;
 
 public class BaseActivity extends AppCompatActivity {
     private static Stack<Activity> activityStack;
-    private static final String TAG = "test_ganlong";
+    public static final String TAG = "test_ganlong";
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,7 +145,7 @@ public class BaseActivity extends AppCompatActivity {
         return false;
     }
 
-    public static boolean isForeground(Context context, String className) {
+    public boolean isForeground(Context context, String className) {
         if (context == null || TextUtils.isEmpty(className)) {
             return false;
         }

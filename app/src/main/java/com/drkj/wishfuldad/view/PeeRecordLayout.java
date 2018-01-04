@@ -33,7 +33,6 @@ public class PeeRecordLayout extends ViewGroup {
     int h3;
     private float mLastX = 0;
     private float mLastY = 0;
-    private List<PeeDataBean> list;
     Bitmap bitmap;
     Bitmap bitmap2;
     public PeeRecordLayout(Context context) {
@@ -52,7 +51,7 @@ public class PeeRecordLayout extends ViewGroup {
     }
     private void initChild(){
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        recordView = new PeeRecordView(getContext());
+        recordView = new PeeRecordView(getContext(),this);
         timeView = new PeeRecordTimeView(getContext());
         dayView = new PeeRecordDayView(getContext());
         recordView.setLayoutParams(layoutParams);
@@ -110,9 +109,11 @@ public class PeeRecordLayout extends ViewGroup {
                 float y = event.getY();
                 if (x>wi/2-w1&&x<wi/2+w1&&y>hi/2-h1&&y<hi/2+h1){
                     recordView.scrollBy(-recordView.getWidth()/5,0);
+                    dayView.scrollBy(-recordView.getWidth()/5,0);
                 }
                 if (x>wi*5+wi/2-w2&&x<wi*5+wi/2+w2&&y>hi/2-h2&&y<hi/2+h2){
                     recordView.scrollBy(recordView.getWidth()/5,0);
+                    dayView.scrollBy(recordView.getWidth()/5,0);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -146,6 +147,12 @@ public class PeeRecordLayout extends ViewGroup {
     public void setDays(List<String> days){
         dayView.setDays(days);
         recordView.setDays(days);
+    }
+
+    public void scroll(int x,int y){
+        dayView.scrollTo(x,0);
+        recordView.scrollTo(x, y);
+        timeView.scrollTo(0,y);
     }
 
 }

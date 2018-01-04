@@ -28,9 +28,12 @@ public class DataView extends View {
     Paint rectPaint;
     Paint textPaint;
     Paint paint;
-
-    public DataView(Context context) {
+    DataLayout layout;
+    private int scrollx;
+    private boolean flag = true;
+    public DataView(Context context,DataLayout layout) {
         super(context);
+        this.layout = layout;
         initData();
     }
 
@@ -94,7 +97,6 @@ public class DataView extends View {
 //        }
         int h = canvas.getHeight() / 11;
         int w = canvas.getWidth() / 6;
-
         for (int j = 0; j <= 23; j++) {
             canvas.drawText(times.get(j), w / 2 + j * w, h / 2, paint);
             canvas.drawLine(w / 2 + j * w, h, w / 2 + j * w, 11 * h, linePaint);
@@ -103,8 +105,13 @@ public class DataView extends View {
                 if (bean.getTime() == j  && bean.getNumber() > 0 && bean.getNumber() < 11) {
                     canvas.drawRect(w / 2 + j * w - 30, h * (11 - bean.getNumber()), w / 2 + j * w + 30, h * (11 - bean.getNumber()) + textH, rectPaint);
                     canvas.drawText(bean.getNumber() + "", w / 2 + j * w, h * (11 - bean.getNumber()) + textH - 5, textPaint);
+                   scrollx = w / 2 + j * w-canvas.getWidth()/2;
                 }
             }
+        }
+        if (flag){
+            flag = false;
+            scrollTo(scrollx,0);
         }
     }
 

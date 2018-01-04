@@ -9,7 +9,7 @@ public class MessageInfo {
     private String content;
     private String filepath;
     private int sendState;
-    private String time;
+    private long time;
     private String header;
     private String imageUrl;
     private long voiceTime;
@@ -47,11 +47,11 @@ public class MessageInfo {
         this.sendState = sendState;
     }
 
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 

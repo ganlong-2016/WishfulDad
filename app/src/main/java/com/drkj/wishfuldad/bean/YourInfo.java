@@ -10,6 +10,9 @@ public class YourInfo {
     //角色 1.baba 2.mama 3.yeye 4.nainai 5.qita
     private int role;
     private String phone;
+    private int birthDayYear;
+    private int birthDayMonth;
+    private int birthDayDay;
 
     public String getName() {
         return name;
@@ -41,5 +44,29 @@ public class YourInfo {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public int getBirthDayYear() {
+        return birthDayYear;
+    }
+
+    public void setBirthDayYear(int birthDayYear) {
+        this.birthDayYear = birthDayYear;
+    }
+
+    public int getBirthDayMonth() {
+        return birthDayMonth;
+    }
+
+    public void setBirthDayMonth(int birthDayMonth) {
+        this.birthDayMonth = birthDayMonth;
+    }
+
+    public int getBirthDayDay() {
+        return birthDayDay;
+    }
+
+    public void setBirthDayDay(int birthDayDay) {
+        this.birthDayDay = birthDayDay;
     }
 }

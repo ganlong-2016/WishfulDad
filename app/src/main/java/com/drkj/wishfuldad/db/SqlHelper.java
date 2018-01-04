@@ -19,6 +19,7 @@ public class SqlHelper extends SQLiteOpenHelper {
         db.execSQL(DbConstant.CREATE_SETTING_TABLE);
         db.execSQL(DbConstant.CREATE_YOUR_INFO_TABLE);
         db.execSQL(DbConstant.CREATE_DATA_TABLE);
+        db.execSQL(DbConstant.CREATE_CHAT_DATA_TABLE);
 
         db.execSQL(DbConstant.INSERT_DEFAULT_SETTING);
         db.execSQL(DbConstant.INSERT_DEFAULT_BABY_INFO);

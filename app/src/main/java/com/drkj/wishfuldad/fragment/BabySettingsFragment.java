@@ -36,9 +36,9 @@ public class BabySettingsFragment extends Fragment implements View.OnClickListen
     private TextView textView2;
     private TextView textView3;
     private TextView textView4;
-    private ImageView headImageView;
-    private TextView babyName;
-    SettingBabyInfoListener listener;
+//    private ImageView headImageView;
+//    private TextView babyName;
+//    SettingBabyInfoListener listener;
 
     public BabySettingsFragment() {
     }
@@ -60,15 +60,15 @@ public class BabySettingsFragment extends Fragment implements View.OnClickListen
         textView2 = activity.findViewById(R.id.village_name_textview2);
         textView3 = activity.findViewById(R.id.village_name_textview3);
         textView4 = activity.findViewById(R.id.village_name_textview4);
-        babyName = activity.findViewById(R.id.text_setting_baby_name);
+//        babyName = activity.findViewById(R.id.text_setting_baby_name);
         textView1.setOnClickListener(this);
         textView2.setOnClickListener(this);
         textView3.setOnClickListener(this);
         textView4.setOnClickListener(this);
 
-        headImageView = activity.findViewById(R.id.baby_head_image_view);
-        setBabyName(BaseApplication.getInstance().getBabyInfo().getName());
-        setBabyInfo(BaseApplication.getInstance().getBabyInfo().getHeadImage());
+//        headImageView = activity.findViewById(R.id.baby_head_image_view);
+//        setBabyName(BaseApplication.getInstance().getBabyInfo().getName());
+//        setBabyInfo(BaseApplication.getInstance().getBabyInfo().getHeadImage());
     }
 
     @Override
@@ -107,26 +107,26 @@ public class BabySettingsFragment extends Fragment implements View.OnClickListen
         }
     }
 
-    public void setBabyInfo(String imageUrlPath) {
-        if (headImageView != null) {
-            try {
-                FileInputStream fis = new FileInputStream(imageUrlPath);
-                Bitmap bitmap = BitmapFactory.decodeStream(fis);
-                headImageView.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+//    public void setBabyInfo(String imageUrlPath) {
+//        if (headImageView != null) {
+//            try {
+//                FileInputStream fis = new FileInputStream(imageUrlPath);
+//                Bitmap bitmap = BitmapFactory.decodeStream(fis);
+//                headImageView.setImageBitmap(bitmap);
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//    }
+//
+//    public void setBabyName(String name) {
+//        if (babyName != null)
+//            babyName.setText(name);
+//    }
 
-    }
-
-    public void setBabyName(String name) {
-        if (babyName != null)
-            babyName.setText(name);
-    }
-
-    public void addSettingBabyInfoListener(SettingBabyInfoListener listener) {
-        this.listener = listener;
-    }
+//    public void addSettingBabyInfoListener(SettingBabyInfoListener listener) {
+//        this.listener = listener;
+//    }
 
 }

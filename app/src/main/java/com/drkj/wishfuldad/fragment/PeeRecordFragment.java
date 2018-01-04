@@ -16,6 +16,7 @@ import com.drkj.wishfuldad.bean.DataBean;
 import com.drkj.wishfuldad.bean.PeeDataBean;
 import com.drkj.wishfuldad.db.DbController;
 import com.drkj.wishfuldad.view.PeeRecordLayout;
+import com.drkj.wishfuldad.view.PeeRecordView;
 import com.umeng.analytics.MobclickAgent;
 
 import java.text.SimpleDateFormat;
@@ -82,6 +83,8 @@ public class PeeRecordFragment extends Fragment {
                 mlayout.setData(beans);
             }
         }
+
+
     }
 
     @Override

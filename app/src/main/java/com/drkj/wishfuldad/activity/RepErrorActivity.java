@@ -13,6 +13,7 @@ import com.drkj.wishfuldad.adapter.ChatViewAdapter;
 import com.drkj.wishfuldad.bean.ChatResultBean;
 import com.drkj.wishfuldad.bean.LoginResultBean;
 import com.drkj.wishfuldad.bean.MessageInfo;
+import com.drkj.wishfuldad.db.DbController;
 import com.drkj.wishfuldad.net.ServerNetClient;
 import com.drkj.wishfuldad.util.Constants;
 import com.drkj.wishfuldad.util.SpUtil;
@@ -63,12 +64,14 @@ public class RepErrorActivity extends BaseActivity {
                                     MessageInfo messageInfo = new MessageInfo();
                                     messageInfo.setContent(dataBean.getContent());
                                     messageInfo.setType(Constants.CHAT_ITEM_TYPE_ACCPET);
-                                    if (!TextUtils.isEmpty(dataBean.getContent())) {
+                                    if (!TextUtils.isEmpty(dataBean.getContent())&&dataBean.getFromid()==1) {
                                         messageInfos.add(messageInfo);
+                                        DbController.getInstance().insertChatData(messageInfo);
                                     }
                                     SpUtil.putInt(RepErrorActivity.this, "mid", dataBean.getId());
                                 }
                                 chatAdapter.notifyDataSetChanged();
+                                chatList.setSelection(chatAdapter.getCount() - 1);
                             }
                         }, new Consumer<Throwable>() {
                             @Override
@@ -82,6 +85,11 @@ public class RepErrorActivity extends BaseActivity {
 
     }
 
+    @OnClick(R.id.back_imageview)
+    void back() {
+        finish();
+    }
+
     @OnClick(R.id.btn_send_message)
     void sendMessage() {
         if (!TextUtils.isEmpty(message.getText().toString())) {
@@ -91,7 +99,7 @@ public class RepErrorActivity extends BaseActivity {
             messageInfos.add(messageInfo);
             chatAdapter.refresh(messageInfos);
             chatAdapter.notifyDataSetChanged();
-
+            DbController.getInstance().insertChatData(messageInfo);
             chatList.setSelection(chatAdapter.getCount() - 1);
 
             ServerNetClient.getInstance().getApi()
@@ -141,7 +149,9 @@ public class RepErrorActivity extends BaseActivity {
      * 构造聊天数据
      */
     private void LoadData() {
-
+        List<MessageInfo> list = DbController.getInstance().queryChatData();
+        messageInfos.addAll(list);
+        chatList.setSelection(chatAdapter.getCount() - 1);
 //        MessageInfo messageInfo = new MessageInfo();
 //        messageInfo.setContent("你好，请问有什么可以帮你？");
 //        messageInfo.setType(Constants.CHAT_ITEM_TYPE_ACCPET);

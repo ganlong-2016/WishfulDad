@@ -85,7 +85,7 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
     Dialog mCameraDialog;
     private Uri imageUri;
     private String imageUrlPath;
-    SettingBabyInfoListener listener;
+//    SettingBabyInfoListener listener;
 
     public static final String[] blood = new String[]{"A", "B", "AB", "O"};
     public static final String[] sex = new String[]{"男", "女"};
@@ -98,7 +98,7 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-    @OnClick(R.id.image_set_baby_info)
+    @OnClick({R.id.image_set_baby_info,R.id.text_blood,R.id.text_sex,R.id.text_weight,R.id.text_height})
     void setBabyInfo() {
         MobclickAgent.onEvent(getContext(), "babyinfoset");
 
@@ -147,17 +147,17 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
 
         int b = BaseApplication.getInstance().getBabyInfo().getBloodType();
         if (b != 4)
-            bloodText.setText("血型:"+blood[b]);
+            bloodText.setText("血型:" + blood[b]);
         int s = BaseApplication.getInstance().getBabyInfo().getSex();
         if (s != 2)
-            sexText.setText("性别:"+sex[s]);
+            sexText.setText("性别:" + sex[s]);
         float h = BaseApplication.getInstance().getBabyInfo().getHeight();
-        if (h>0){
-            height.setText("身高:"+h+"cm");
+        if (h > 0) {
+            height.setText("身高:" + h + "cm");
         }
         float w = BaseApplication.getInstance().getBabyInfo().getWeight();
-        if (w>0){
-            weight.setText("体重:"+w+"Kg");
+        if (w > 0) {
+            weight.setText("体重:" + w + "Kg");
         }
     }
 
@@ -176,27 +176,16 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
         Calendar dateAndTime = Calendar.getInstance();
         DatePickerDialog dateDlg = new DatePickerDialog(activity,
                 dateSetListener,
-                dateAndTime.get(Calendar.YEAR),
+                dateAndTime.get(Calendar.YEAR)-18,
                 dateAndTime.get(Calendar.MONTH),
-                dateAndTime.get(Calendar.DAY_OF_MONTH)){
-            @Override
-            public void onDateChanged(@NonNull DatePicker view, int year, int month, int dayOfMonth) {
-//                if (!isEighteen(year,month,dayOfMonth)){
-                    super.onDateChanged(view, year, month, dayOfMonth);
-//                }
-            }
-        };
-
+                dateAndTime.get(Calendar.DAY_OF_MONTH));
+        DatePicker picker = dateDlg.getDatePicker();
+        picker.setMaxDate(dateAndTime.getTimeInMillis());
+        dateAndTime.set(Calendar.YEAR,dateAndTime.get(Calendar.YEAR)-18);
+        picker.setMinDate(dateAndTime.getTimeInMillis());
         dateDlg.show();
     }
-//    private boolean isEighteen(int year, int month, int dayOfMonth){
-//        Calendar calendar = Calendar.getInstance();
-//        int y = calendar.get(Calendar.YEAR);
-//        int m = calendar.get(Calendar.MONTH);
-//        int d = calendar.get(Calendar.DAY_OF_MONTH);
-//        if (year)
-//        return false;
-//    }
+
     @OnClick(R.id.baby_head_image_view1)
     void addHead() {
         if (activity.checkMission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -225,8 +214,6 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
 
     //当点击DatePickerDialog控件的设置按钮时，调用该方法
     DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-
-
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
@@ -248,9 +235,9 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
     @OnTextChanged(R.id.edit_baby_info_name)
     void setName(CharSequence s, int start, int before, int count) {
         if (!TextUtils.isEmpty(s)) {
-            if (listener != null) {
-                listener.setName(s.toString());
-            }
+//            if (listener != null) {
+//                listener.setName(s.toString());
+//            }
             BaseApplication.getInstance().getBabyInfo().setName(s.toString());
         }
     }
@@ -327,7 +314,7 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
                         mCameraDialog.dismiss();
                     }
                     headImageView.setImageBitmap(photo);
-                    listener.settingComplete(imageUrlPath);
+//                    listener.settingComplete(imageUrlPath);
                     break;
                 default:
                     break;
@@ -350,8 +337,8 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
         startActivityForResult(intent, 400);
     }
 
-    public void addSettingBabyInfoListener(SettingBabyInfoListener listener) {
-        this.listener = listener;
-    }
+//    public void addSettingBabyInfoListener(SettingBabyInfoListener listener) {
+//        this.listener = listener;
+//    }
 
 }

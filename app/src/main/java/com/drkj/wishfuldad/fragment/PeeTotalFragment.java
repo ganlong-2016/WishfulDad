@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.drkj.wishfuldad.R;
 import com.drkj.wishfuldad.bean.DataBean;
@@ -62,7 +63,10 @@ public class PeeTotalFragment extends Fragment {
     ImageView thisWeekPee6;
     @BindView(R.id.layout_this_week_pee)
     LinearLayout thisWeekPeeMore;
-
+    @BindView(R.id.text_today_pee)
+    TextView todayPeeText;
+    @BindView(R.id.text_total_pee)
+    TextView thisweekPeeText;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -86,6 +90,8 @@ public class PeeTotalFragment extends Fragment {
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         days.add(simpleDateFormat.format(calendar.getTime()));
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+        days.add(simpleDateFormat.format(calendar.getTime()));
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
         days.add(simpleDateFormat.format(calendar.getTime()));
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
         days.add(simpleDateFormat.format(calendar.getTime()));
@@ -112,6 +118,8 @@ public class PeeTotalFragment extends Fragment {
         if (thisWeekPee>0){
             dataLayout.setVisibility(View.VISIBLE);
             nodataLayout.setVisibility(View.GONE);
+            todayPeeText.setText(todayPee+"");
+            thisweekPeeText.setText(thisWeekPee+"");
             showData(todayPee,thisWeekPee);
         }
     }
