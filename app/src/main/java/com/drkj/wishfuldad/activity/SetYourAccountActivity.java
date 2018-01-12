@@ -1,7 +1,10 @@
 package com.drkj.wishfuldad.activity;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,7 +19,9 @@ import com.drkj.wishfuldad.BaseApplication;
 import com.drkj.wishfuldad.R;
 import com.drkj.wishfuldad.bean.IdentifyResultBean;
 import com.drkj.wishfuldad.bean.LoginResultBean;
+import com.drkj.wishfuldad.db.DbController;
 import com.drkj.wishfuldad.net.ServerNetClient;
+import com.drkj.wishfuldad.util.FileUtil;
 import com.drkj.wishfuldad.util.SpUtil;
 import com.umeng.analytics.MobclickAgent;
 
@@ -33,7 +38,9 @@ import butterknife.OnTextChanged;
 import butterknife.OnTouch;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
 
 public class SetYourAccountActivity extends BaseActivity {
 
@@ -174,15 +181,22 @@ public class SetYourAccountActivity extends BaseActivity {
                     public void accept(LoginResultBean loginResultBean) throws Exception {
                         int a = loginResultBean.getStatus();
                         if (a == 1) {
-                            BaseApplication.getInstance().getYourInfo().setPhone(mPhone.getText().toString());
-                            BaseApplication.getInstance().setToken(loginResultBean.getData().getToken());
-                            if (TextUtils.isEmpty(SpUtil.getToken(SetYourAccountActivity.this, "token"))) {
-
-                                startActivity(new Intent(SetYourAccountActivity.this, SetBabyInfoActivity.class));
-                            } else {
-                                SpUtil.putString(SetYourAccountActivity.this,"token",BaseApplication.getInstance().getToken());
-                                startActivity(new Intent(SetYourAccountActivity.this, CardActivity.class));
+                            if (!TextUtils.isEmpty(loginResultBean.getData().getName()))
+                                initData(loginResultBean);
+                            else {
+                                BaseApplication.getInstance().getYourInfo().setPhone(mPhone.getText().toString());
+                                BaseApplication.getInstance().setToken(loginResultBean.getData().getToken());
+                                startActivity(new Intent(SetYourAccountActivity.this, SetYourInfoActivity.class));
                             }
+
+//
+//                            if (TextUtils.isEmpty(SpUtil.getToken(SetYourAccountActivity.this, "token"))) {
+//
+//                                startActivity(new Intent(SetYourAccountActivity.this, SetBabyInfoActivity.class));
+//                            } else {
+//                                SpUtil.putString(SetYourAccountActivity.this,"token",BaseApplication.getInstance().getToken());
+//                                startActivity(new Intent(SetYourAccountActivity.this, CardActivity.class));
+//                            }
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -195,7 +209,7 @@ public class SetYourAccountActivity extends BaseActivity {
     }
 
     public boolean isChinaPhoneLegal(String str) throws PatternSyntaxException {
-        String regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$";
+        String regExp = "^((13[0-9])|(15[^4])|(18[0,1,2,3,5-9])|(17[0-8])|(147))\\d{8}$";
         Pattern p = Pattern.compile(regExp);
         Matcher m = p.matcher(str);
         return m.matches();
@@ -213,5 +227,51 @@ public class SetYourAccountActivity extends BaseActivity {
             }
         });
         dialog.show();
+    }
+
+    private void initData(LoginResultBean loginResultBean) {
+        BaseApplication.getInstance().getYourInfo().setName(loginResultBean.getData().getName());
+        BaseApplication.getInstance().getYourInfo().setAge(loginResultBean.getData().getAge());
+        BaseApplication.getInstance().getYourInfo().setRole(loginResultBean.getData().getRole());
+        BaseApplication.getInstance().getBabyInfo().setName(loginResultBean.getData().getCname());
+        BaseApplication.getInstance().getBabyInfo().setAge(loginResultBean.getData().getCage());
+        BaseApplication.getInstance().getBabyInfo().setSex(loginResultBean.getData().getCsex());
+        SpUtil.putString(SetYourAccountActivity.this, "token", loginResultBean.getData().getToken());
+        ServerNetClient.getInstance().getApi()
+                .downloadPicFromNet("http://47.100.32.240" + loginResultBean.getData().getCphoto())
+                .subscribeOn(Schedulers.newThread())
+                .map(new Function<ResponseBody, Bitmap>() {
+                    @Override
+                    public Bitmap apply(ResponseBody responseBody) throws Exception {
+                        Bitmap bitmap = BitmapFactory.decodeStream(responseBody.byteStream());
+                        return bitmap;
+                    }
+                }).map(new Function<Bitmap, String>() {
+            @Override
+            public String apply(Bitmap bitmap) throws Exception {
+                if (!checkMission(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    return null;
+                String imagePath = FileUtil.saveFile(SetYourAccountActivity.this, "temphead.jpg", bitmap);
+                return imagePath;
+            }
+        })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String imagePath) throws Exception {
+                        if (!TextUtils.isEmpty(imagePath)) {
+                            BaseApplication.getInstance().getBabyInfo().setHeadImage(imagePath);
+                            DbController.getInstance().updateBabyInfoData(BaseApplication.getInstance().getBabyInfo());
+                            DbController.getInstance().updateYourInfoData(BaseApplication.getInstance().getYourInfo());
+                            finishAllActivity();
+                            startActivity(new Intent(SetYourAccountActivity.this, CardActivity.class));
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
+                    }
+                });
     }
 }

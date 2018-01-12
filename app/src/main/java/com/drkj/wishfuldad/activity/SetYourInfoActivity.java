@@ -154,7 +154,7 @@ public class SetYourInfoActivity extends BaseActivity {
         BaseApplication.getInstance().getYourInfo().setName(mInputNmae.getText().toString());
 //        BaseApplication.getInstance().getYourInfo().setAge(Integer.parseInt(mInputAge.getText().toString()));
         BaseApplication.getInstance().getYourInfo().setRole(role);
-        startActivity(new Intent(this,SetYourAccountActivity.class));
+        startActivity(new Intent(this,SetBabyInfoActivity.class));
     }
     @OnTouch(R.id.et_input_name)
     boolean clearName(MotionEvent event){

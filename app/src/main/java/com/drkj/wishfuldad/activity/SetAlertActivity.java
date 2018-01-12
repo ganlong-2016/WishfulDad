@@ -26,7 +26,7 @@ public class SetAlertActivity extends BaseActivity {
     ImageView mOpenLayout;
     @BindView(R.id.layout_choose_music)
     LinearLayout mLayout;
-    boolean open = false;
+    boolean open = true;
     @BindView(R.id.village_sel_imageview)
     CheckBox vibrate;
     @BindView(R.id.checkbox_raw1)

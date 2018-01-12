@@ -38,67 +38,184 @@
     </RelativeLayout>
 
 
-
-
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffffff">
+        android:background="#ffffff"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginTop="20dp"
+               android:text="打开奶爸听差APP，按照相应提示打开蓝牙开关搜索并连接设备。连接成功后您就可以正常使用了。"
+               android:textColor="#363636"
+               android:lineSpacingExtra="5dp"
+               android:textSize="14sp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_use_explain1"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="图一:奶爸听差首页"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#979696"
+                android:textSize="12sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="首页"
+                android:textSize="14sp"
+                android:textColor="#363636"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="您可以在这里查看宝宝实时的温度与湿度，尿尿次数踢被与离距的两个开关也在这里，您可以打开开关对宝宝的相应状态进行检查。"
+                android:textSize="14sp"
+                android:lineSpacingExtra="5dp"
+                android:textColor="#363636"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_use_explain2"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="图二:数据页-尿点记录"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#979696"
+                android:textSize="12sp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_use_explain3"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="图三:数据页-预测"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#979696"
+                android:textSize="12sp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_use_explain4"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="图四:数据页-尿片量"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#979696"
+                android:textSize="12sp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_use_explain5"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="图五:数据页-踢被统计"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#979696"
+                android:textSize="12sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="数据信息页"
+                android:textSize="14sp"
+                android:textColor="#363636"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="您可以在这里左右滑动查看宝宝的历史尿尿情况、宝宝尿尿的高频时间段、尿片使用量、踢被情况方便您更好的照顾宝宝。"
+                android:textSize="14sp"
+                android:lineSpacingExtra="5dp"
+                android:textColor="#363636"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_use_explain6"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="图六:个人中心-设置页"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#979696"
+                android:textSize="12sp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="奶爸听差使用说明,按以下指示操作"
                 android:layout_marginTop="20dp"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginTop="20dp"
+                android:text="个人中心"
                 android:textSize="14sp"
-                android:text="1.进入主界面后点击蓝牙按钮开始搜索蓝牙,搜索成功后点击您的蓝牙设备开始连接。"/>
-                <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="240dp"
-                    android:layout_marginTop="20dp"
-                    android:src="@drawable/ic_nodata"/>
+                android:textColor="#363636"/>
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="8dp"
+                android:text="1.1宝宝信息:您可以在这里修改宝宝的相关信息"
                 android:textSize="14sp"
-                android:text="2.连接成功后,奶爸听差会快速读取环境中的湿度和温度,存储宝宝的基础数据。"/>
+                android:lineSpacingExtra="5dp"
+                android:textColor="#363636"/>
 
-            <TextView
-                android:layout_width="match_parent"
+            <ImageView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginTop="20dp"
-                android:textSize="14sp"
-                android:text="3.进入个人中心界面编辑宝宝信息,设置天气和报警。"/>
-
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_use_explain7"/>
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginTop="20dp"
+                android:text="图七:个人中心-设置页"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#979696"
+                android:textSize="12sp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="1.2设置:您可以在这里对天气环境、提示方式等进行个性化操作，漂亮的客服妹妹也在这里随时回您解决问题哟。"
                 android:textSize="14sp"
-                android:text="4.进入数据信息界面,查看宝宝基础数据。"/>
+                android:lineSpacingExtra="5dp"
+                android:textColor="#363636"/>
         </LinearLayout>
+
     </ScrollView>
 
 

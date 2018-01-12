@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.drkj.wishfuldad.R;
@@ -18,28 +20,31 @@ import java.util.List;
  * Created by ganlong on 2017/12/20.
  */
 
-public class DataLayout extends ViewGroup {
+public class DataLayout extends ViewGroup implements View.OnTouchListener {
 
     private DataView dataView;
     Paint paint;
     Bitmap bitmap;
     Bitmap bitmap2;
+
+    private GestureDetector gestureDetector;
+    private float mLastX = 0;
     public DataLayout(Context context) {
         super(context);
-        initChild();
+        initChild(context);
     }
 
     public DataLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initChild();
+        initChild(context);
     }
 
     public DataLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initChild();
+        initChild(context);
     }
 
-    private void initChild(){
+    private void initChild(Context context){
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         dataView = new DataView(getContext(),this);
         dataView.setLayoutParams(layoutParams);
@@ -53,9 +58,45 @@ public class DataLayout extends ViewGroup {
         paint.setColor(getResources().getColor(R.color.line_color));
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_left_button);
         bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_right_button);
+        setOnTouchListener(this);
+        gestureDetector = new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public boolean onDown(MotionEvent event) {
+                float x = event.getX();
+                float y = event.getY();
+                mLastX = x;
+                if (x>wi/2-w1&&x<wi/2+w1&&y>hi/2-h1&&y<hi/2+h1){
+                    dataView.scrollBy(-dataView.getWidth()/6,0);
+                }
+                if (x>wi*6+wi/2-w2&&x<wi*6+wi/2+w2&&y>hi/2-h2&&y<hi/2+h2){
+                    dataView.scrollBy(dataView.getWidth()/6,0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                dataView.onDoubleTap(e);
+                return true;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                float currentX = e2.getX();
+                float moveX = mLastX - currentX;
+                mLastX = currentX;
+
+                if (currentX > wi && currentX < w3 ) {
+                    dataView.scrollBy((int) (moveX),0);
+                }
+
+                return true;
+            }
+        });
     }
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        w3 = r - l - wi;
         dataView.layout(wi,0,r-l-wi,b-t);
     }
     int wi;
@@ -64,6 +105,7 @@ public class DataLayout extends ViewGroup {
     int h1;
     int w2;
     int h2;
+    int w3;
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -92,28 +134,33 @@ public class DataLayout extends ViewGroup {
         hi = h/11;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                float x = event.getX();
-                float y = event.getY();
-                if (x>wi/2-w1&&x<wi/2+w1&&y>hi/2-h1&&y<hi/2+h1){
-                    dataView.scrollBy(-dataView.getWidth()/6,0);
-                }
-                if (x>wi*6+wi/2-w2&&x<wi*6+wi/2+w2&&y>hi/2-h2&&y<hi/2+h2){
-                    dataView.scrollBy(dataView.getWidth()/6,0);
-                }
-                break;
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        switch (event.getAction()){
+//            case MotionEvent.ACTION_DOWN:
+//                float x = event.getX();
+//                float y = event.getY();
+//                if (x>wi/2-w1&&x<wi/2+w1&&y>hi/2-h1&&y<hi/2+h1){
+//                    dataView.scrollBy(-dataView.getWidth()/6,0);
+//                }
+//                if (x>wi*6+wi/2-w2&&x<wi*6+wi/2+w2&&y>hi/2-h2&&y<hi/2+h2){
+//                    dataView.scrollBy(dataView.getWidth()/6,0);
+//                }
+//                break;
+//        }
+//        return true;
+//    }
 
     public void setData(List<TibeiDataBean> list){
         dataView.setData(list);
     }
 
-    public void scroll(int x,int y){
-
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if (gestureDetector!=null){
+            gestureDetector.onTouchEvent(event);
+            return true;
+        }
+        return false;
     }
 }

@@ -268,16 +268,16 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="5dp"
-                                android:text="0"
+                                android:text=""
                                 android:textColor="@color/toolbar_color"
                                 android:textSize="18sp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="m"
-                                android:textColor="@color/toolbar_color"
-                                android:textSize="12sp"/>
+                            <!--<TextView-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:text="m"-->
+                                <!--android:textColor="@color/toolbar_color"-->
+                                <!--android:textSize="12sp"/>-->
                         </LinearLayout>
 
                         <Switch

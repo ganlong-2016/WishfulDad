@@ -17,12 +17,12 @@
 
         <TextView
             android:id="@+id/textView5"
-            android:layout_width="80dp"
-            android:layout_height="45dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:text="宝贝信息"
+            android:text="修改宝贝信息"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#fff" />
 
@@ -55,7 +55,7 @@
         <RelativeLayout
             android:layout_width="350dp"
             android:layout_height="50dp"
-            android:background="#f0f0f0" >
+             >
 
             <TextView
                 android:id="@+id/textView1"

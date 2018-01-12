@@ -23,9 +23,9 @@ public class ServerNetClient {
     private ServerNetClient(){
         Gson gson = new GsonBuilder().create();
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .writeTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(3, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
                 .build();
         retrofit = new Retrofit.Builder()
                 .baseUrl(ConstantUrl.SERVER_ADDRESS)

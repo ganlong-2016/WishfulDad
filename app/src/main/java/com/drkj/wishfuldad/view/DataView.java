@@ -31,6 +31,11 @@ public class DataView extends View {
     DataLayout layout;
     private int scrollx;
     private boolean flag = true;
+
+    private List<Integer> textX = new ArrayList<>();
+
+    private int tempMoveX = 0;
+
     public DataView(Context context,DataLayout layout) {
         super(context);
         this.layout = layout;
@@ -105,7 +110,8 @@ public class DataView extends View {
                 if (bean.getTime() == j  && bean.getNumber() > 0 && bean.getNumber() < 11) {
                     canvas.drawRect(w / 2 + j * w - 30, h * (11 - bean.getNumber()), w / 2 + j * w + 30, h * (11 - bean.getNumber()) + textH, rectPaint);
                     canvas.drawText(bean.getNumber() + "", w / 2 + j * w, h * (11 - bean.getNumber()) + textH - 5, textPaint);
-                   scrollx = w / 2 + j * w-canvas.getWidth()/2;
+                    scrollx = w / 2 + j * w-canvas.getWidth()/2;
+                    textX.add(w / 2 + j * w);
                 }
             }
         }
@@ -115,23 +121,23 @@ public class DataView extends View {
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        float currentX = event.getX();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mLastX = currentX;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                float moveX = mLastX - currentX;
-                mLastX = currentX;
-//                offsetLeftAndRight((int) (moveX));
-                scrollBy((int) (moveX), 0);
-                break;
-
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        float currentX = event.getX();
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                mLastX = currentX;
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                float moveX = mLastX - currentX;
+//                mLastX = currentX;
+////                offsetLeftAndRight((int) (moveX));
+//                scrollBy((int) (moveX), 0);
+//                break;
+//
+//        }
+//        return true;
+//    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -152,6 +158,7 @@ public class DataView extends View {
             x = mMaxPosition;
             getParent().requestDisallowInterceptTouchEvent(false);
         }
+        tempMoveX = x;
         if (x != getScrollX()) {
             super.scrollTo(x, y);
         }
@@ -165,5 +172,19 @@ public class DataView extends View {
     public boolean dispatchTouchEvent(MotionEvent ev) {
         getParent().requestDisallowInterceptTouchEvent(true);
         return super.dispatchTouchEvent(ev);
+    }
+
+    public void onDoubleTap(MotionEvent event){
+        int x1 = (int) event.getX()+tempMoveX-getWidth()/6;
+        double distance = -1;
+        int tempX = 0;
+        for (int i = 0; i < textX.size(); i++) {
+            double tempDis = Math.abs(x1 - textX.get(i));
+            if (distance == -1 || distance > tempDis) {
+                distance = tempDis;
+                tempX = textX.get(i);
+            }
+        }
+        scrollTo(tempX - getWidth() / 2, 0);
     }
 }

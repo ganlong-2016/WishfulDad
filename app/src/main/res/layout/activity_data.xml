@@ -38,43 +38,73 @@
                 android:textColor="#fff"
                 android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+            <ImageView
+                android:id="@+id/image_pee_record_select"
+                android:layout_width="72dp"
+                android:layout_height="5dp"
+                android:layout_alignParentBottom="true"
+                android:visibility="visible"
+                android:background="@color/white"/>
             <TextView
                 android:id="@+id/urine_forecast_text"
                 android:layout_width="72dp"
                 android:layout_height="45dp"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="6dp"
-                android:layout_toRightOf="@+id/urine_record_text"
+                android:layout_marginStart="6dp"
+                android:layout_toEndOf="@+id/urine_record_text"
                 android:gravity="center"
                 android:text="尿点预测"
                 android:textColor="#f9c9d8"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+            <ImageView
+                android:id="@+id/image_pee_guest_select"
+                android:layout_width="72dp"
+                android:layout_height="5dp"
+                android:layout_marginStart="6dp"
+                android:layout_toEndOf="@+id/urine_record_text"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"
+                android:background="@color/white"/>
             <TextView
                 android:id="@+id/diapers_number_text"
                 android:layout_width="72dp"
                 android:layout_height="45dp"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="6dp"
-                android:layout_toRightOf="@+id/urine_forecast_text"
+                android:layout_marginStart="6dp"
+                android:layout_toEndOf="@+id/urine_forecast_text"
                 android:gravity="center"
                 android:text="尿片量"
                 android:textColor="#f9c9d8"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+            <ImageView
+                android:id="@+id/image_pee_total_select"
+                android:layout_width="72dp"
+                android:layout_height="5dp"
+                android:layout_marginStart="6dp"
+                android:layout_toEndOf="@+id/urine_forecast_text"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"
+                android:background="@color/white"/>
             <TextView
                 android:id="@+id/kickquilt_num_text"
                 android:layout_width="72dp"
                 android:layout_height="45dp"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="6dp"
-                android:layout_toRightOf="@+id/diapers_number_text"
+                android:layout_marginStart="6dp"
+                android:layout_toEndOf="@+id/diapers_number_text"
                 android:gravity="center"
                 android:text="踢被统计"
                 android:textColor="#f9c9d8"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+            <ImageView
+                android:id="@+id/image_tibei_select"
+                android:layout_width="72dp"
+                android:layout_height="5dp"
+                android:layout_marginStart="6dp"
+                android:layout_toEndOf="@+id/diapers_number_text"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"
+                android:background="@color/white"/>
         </RelativeLayout>
     </LinearLayout>
     <android.support.v4.view.ViewPager

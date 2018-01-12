@@ -54,24 +54,33 @@ public class RepErrorActivity extends BaseActivity {
             @Override
             public void run() {
                 ServerNetClient.getInstance().getApi()
-                        .getMsgList(SpUtil.getToken(RepErrorActivity.this, "token"), 1, SpUtil.getInt(RepErrorActivity.this, "mid"))
+                        .getMsgList(SpUtil.getString(RepErrorActivity.this, "token"), 1, SpUtil.getInt(RepErrorActivity.this, "mid"))
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Consumer<ChatResultBean>() {
                             @Override
                             public void accept(ChatResultBean chatResultBean) throws Exception {
-                                for (ChatResultBean.DataBean dataBean : chatResultBean.getData()) {
+                                for (int i=chatResultBean.getData().size()-1;i>=0;i--){
+                                    ChatResultBean.DataBean dataBean = chatResultBean.getData().get(i);
                                     MessageInfo messageInfo = new MessageInfo();
                                     messageInfo.setContent(dataBean.getContent());
-                                    messageInfo.setType(Constants.CHAT_ITEM_TYPE_ACCPET);
-                                    if (!TextUtils.isEmpty(dataBean.getContent())&&dataBean.getFromid()==1) {
+                                    if (!TextUtils.isEmpty(dataBean.getContent())) {
+                                        if (dataBean.getFromid()==1){
+                                            messageInfo.setType(Constants.CHAT_ITEM_TYPE_ACCPET);
+                                        }else {
+                                            messageInfo.setType(Constants.CHAT_ITEM_TYPE_SEND);
+                                        }
                                         messageInfos.add(messageInfo);
                                         DbController.getInstance().insertChatData(messageInfo);
+                                        chatAdapter.notifyDataSetChanged();
+                                        chatList.setSelection(chatAdapter.getCount() - 1);
                                     }
-                                    SpUtil.putInt(RepErrorActivity.this, "mid", dataBean.getId());
                                 }
-                                chatAdapter.notifyDataSetChanged();
-                                chatList.setSelection(chatAdapter.getCount() - 1);
+//                                for (ChatResultBean.DataBean dataBean : chatResultBean.getData()) {
+//
+//                                }
+                                SpUtil.putInt(RepErrorActivity.this, "mid", chatResultBean.getData().get(0).getId());
+
                             }
                         }, new Consumer<Throwable>() {
                             @Override
@@ -103,15 +112,13 @@ public class RepErrorActivity extends BaseActivity {
             chatList.setSelection(chatAdapter.getCount() - 1);
 
             ServerNetClient.getInstance().getApi()
-                    .sendMsg(SpUtil.getToken(RepErrorActivity.this, "token"), message.getText().toString())
+                    .sendMsg(SpUtil.getString(RepErrorActivity.this, "token"), message.getText().toString())
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<ChatResultBean>() {
                         @Override
                         public void accept(ChatResultBean chatResultBean) throws Exception {
-                            for (ChatResultBean.DataBean dataBean : chatResultBean.getData()) {
-                                SpUtil.putInt(RepErrorActivity.this, "mid", dataBean.getId());
-                            }
+                            SpUtil.putInt(RepErrorActivity.this, "mid", chatResultBean.getData().get(0).getId());
                         }
                     }, new Consumer<Throwable>() {
                         @Override

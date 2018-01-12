@@ -25,6 +25,7 @@
     <string name="pick_photo">本地相册</string>
     <string name="cancel">取消</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="switch_tibei_hint">请注意使用该功能时,请保持环境中有一定光源,该功能的核心元件为光敏传感器,在过暗环境下,可能导致该功能无法正常使用</string>
+    <string name="update_hint">(设备及功能将持续更新,请关注版本更新)</string>
+    <string name="distance_hint">请注意避免手机与设备间存在太多障碍,这会导致报警提示过于频繁及不准确,您可以将设备放置于宝宝的口袋或遮挡较少的位置,以提高提示的准确性</string>
 </resources>

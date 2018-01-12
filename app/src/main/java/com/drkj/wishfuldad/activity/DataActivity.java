@@ -20,6 +20,8 @@ import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+
 public class DataActivity extends BaseActivity implements View.OnClickListener{
 
     private ViewPager viewPager;
@@ -32,6 +34,14 @@ public class DataActivity extends BaseActivity implements View.OnClickListener{
     private TextView peeTotalTextView;
     private TextView blanketTotalTextView;
 
+    @BindView(R.id.image_pee_record_select)
+    ImageView peeRecordSelect;
+    @BindView(R.id.image_pee_guest_select)
+    ImageView peeGuestSelect;
+    @BindView(R.id.image_pee_total_select)
+    ImageView peeTotalSelect;
+    @BindView(R.id.image_tibei_select)
+    ImageView tibeiSelect;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +90,10 @@ public class DataActivity extends BaseActivity implements View.OnClickListener{
 
             @Override
             public void onPageSelected(int position) {
+                peeRecordSelect.setVisibility(View.GONE);
+                peeGuestSelect.setVisibility(View.GONE);
+                peeTotalSelect.setVisibility(View.GONE);
+                tibeiSelect.setVisibility(View.GONE);
                 switch (position) {
                     case 0:
                         peeRecordTextView.setTextColor(getResources().getColor(R.color.toolbar_text_check));
@@ -90,6 +104,8 @@ public class DataActivity extends BaseActivity implements View.OnClickListener{
                         peeTotalTextView.getPaint().setFakeBoldText(false);
                         blanketTotalTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
                         blanketTotalTextView.getPaint().setFakeBoldText(false);
+
+                        peeRecordSelect.setVisibility(View.VISIBLE);
                         break;
                     case 1:
                         peeRecordTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
@@ -100,6 +116,8 @@ public class DataActivity extends BaseActivity implements View.OnClickListener{
                         peeTotalTextView.getPaint().setFakeBoldText(false);
                         blanketTotalTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
                         blanketTotalTextView.getPaint().setFakeBoldText(false);
+
+                        peeGuestSelect.setVisibility(View.VISIBLE);
                         break;
                     case 2:
                         peeRecordTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
@@ -110,6 +128,8 @@ public class DataActivity extends BaseActivity implements View.OnClickListener{
                         peeTotalTextView.getPaint().setFakeBoldText(true);
                         blanketTotalTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
                         blanketTotalTextView.getPaint().setFakeBoldText(false);
+
+                        peeTotalSelect.setVisibility(View.VISIBLE);
                         break;
                     case 3:
                         peeRecordTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
@@ -120,6 +140,8 @@ public class DataActivity extends BaseActivity implements View.OnClickListener{
                         peeTotalTextView.getPaint().setFakeBoldText(false);
                         blanketTotalTextView.setTextColor(getResources().getColor(R.color.toolbar_text_check));
                         blanketTotalTextView.getPaint().setFakeBoldText(true);
+
+                        tibeiSelect.setVisibility(View.VISIBLE);
                         break;
                 }
             }

@@ -131,8 +131,6 @@ public class CardActivity extends BaseActivity {
     @BindView(R.id.switch_liju)
     Switch distanceSwitch;
 
-    private boolean distanceHint = false;
-    private boolean tibeiHint = false;
     private boolean isForeground;
 
     private int peeTimes = 0;
@@ -538,16 +536,16 @@ public class CardActivity extends BaseActivity {
             case R.id.switch_tibei:
                 MobclickAgent.onEvent(this, "tickSwitch");
                 tibei = isChecked;
-                if (isChecked && !tibeiHint) {
-                    tibeiHint = true;
+                if (isChecked && !SpUtil.getBoolen(this,"tibeihint")) {
+
                     showtibeiDialog();
                 }
                 break;
             case R.id.switch_liju:
                 MobclickAgent.onEvent(this, "distanceSwitch");
                 distance = isChecked;
-                if (isChecked && !distanceHint) {
-                    distanceHint = true;
+                if (isChecked && !SpUtil.getBoolen(this,"distancehint")) {
+
                     showDistanceDialog();
                 }
                 break;
@@ -617,61 +615,57 @@ public class CardActivity extends BaseActivity {
 
     private void showtibeiDialog() {
         final Dialog dialog = new Dialog(this, R.style.MyDialog);
-        dialog.setContentView(R.layout.dialog_hint2);
+        dialog.setContentView(R.layout.dialog_hint_tibei);
         TextView textOK = dialog.findViewById(R.id.text_ok);
         textOK.setTextColor(getResources().getColor(R.color.blue));
-        textOK.setText("确认");
+
         textOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
+                SpUtil.putBoolean(CardActivity.this,"tibeihint",true);
             }
         });
         TextView textCancel = dialog.findViewById(R.id.text_cancel);
-        textCancel.setText("取消");
+
         textCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
-                tibeiSwitch.setChecked(false);
+
             }
         });
-        TextView message = dialog.findViewById(R.id.text_message);
-        message.setText("奶爸听差将开启踢被检查模式,\n请确认宝宝已盖好被子");
+
         dialog.show();
     }
 
     private void showDistanceDialog() {
         final Dialog dialog = new Dialog(this, R.style.MyDialog);
-        dialog.setContentView(R.layout.dialog_hint2);
+        dialog.setContentView(R.layout.dialog_hint_distance);
         TextView textOK = dialog.findViewById(R.id.text_ok);
         textOK.setTextColor(getResources().getColor(R.color.blue));
-        textOK.setText("确认");
         textOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
+                SpUtil.putBoolean(CardActivity.this,"distancehint",true);
             }
         });
         TextView textCancel = dialog.findViewById(R.id.text_cancel);
-        textCancel.setText("取消");
         textCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
-                distanceSwitch.setChecked(false);
             }
         });
-        TextView message = dialog.findViewById(R.id.text_message);
-        message.setText("奶爸听差将开启距离检查模式");
         dialog.show();
     }
 
@@ -708,7 +702,6 @@ public class CardActivity extends BaseActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             moveTaskToBack(false);
-            return true;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -791,7 +784,13 @@ public class CardActivity extends BaseActivity {
                         double d = Math.pow(10, power);
                         BigDecimal b = new BigDecimal(d);
                         double f1 = b.setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
-                        distanceText.setText(f1 + "");
+                        if (f1<=5){
+                            distanceText.setText("近");
+                        }else if (f1<=10){
+                            distanceText.setText("中");
+                        }else if (f1>10){
+                            distanceText.setText("远");
+                        }
                         if (iRssi >= 85) {
                             num++;
                         } else {

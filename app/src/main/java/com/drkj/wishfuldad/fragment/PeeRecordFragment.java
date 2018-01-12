@@ -54,6 +54,7 @@ public class PeeRecordFragment extends Fragment {
 
         babyName.setText(BaseApplication.getInstance().getBabyInfo().getName() + "，最近7天尿点记录");
         List<DataBean> dataBeans = DbController.getInstance().queryData();
+//        List<DataBean> dataBeans = loadData();
         if (dataBeans.size() > 0) {
 
             List<String> days = new ArrayList<>();
@@ -91,5 +92,34 @@ public class PeeRecordFragment extends Fragment {
     public void onPause() {
         super.onPause();
         MobclickAgent.onPageStart("PeeRecordFragment");
+    }
+
+    private List<DataBean> loadData(){
+        List<DataBean> dataBeans = new ArrayList<>();
+
+        DataBean dataBean = new DataBean();
+        dataBean.setType(DataBean.TYPE_PEE);
+        dataBean.setDate("01-11");
+        dataBean.setTime("03:18");
+        dataBeans.add(dataBean);
+
+        DataBean dataBean1 = new DataBean();
+        dataBean1.setType(DataBean.TYPE_PEE);
+        dataBean1.setDate("01-10");
+        dataBean1.setTime("23:18");
+        dataBeans.add(dataBean1);
+
+        DataBean dataBean2 = new DataBean();
+        dataBean2.setType(DataBean.TYPE_PEE);
+        dataBean2.setDate("01-05");
+        dataBean2.setTime("13:18");
+        dataBeans.add(dataBean2);
+
+        DataBean dataBean3 = new DataBean();
+        dataBean3.setType(DataBean.TYPE_PEE);
+        dataBean3.setDate("01-08");
+        dataBean3.setTime("18:18");
+        dataBeans.add(dataBean3);
+        return dataBeans;
     }
 }

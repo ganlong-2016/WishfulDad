@@ -1,5 +1,6 @@
 package com.drkj.wishfuldad.activity;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.drkj.wishfuldad.BaseActivity;
 import com.drkj.wishfuldad.BaseApplication;
 import com.drkj.wishfuldad.R;
+import com.drkj.wishfuldad.bean.BabyInfo;
 import com.drkj.wishfuldad.db.DbController;
 import com.drkj.wishfuldad.fragment.BabyInfoFragment;
 import com.drkj.wishfuldad.fragment.BabySettingsFragment;
@@ -20,6 +22,9 @@ import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.OnClick;
 
 public class BabyInfoActivity extends BaseActivity implements View.OnClickListener {
 
@@ -33,6 +38,12 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
     private TextView babyInfoTextView;
     private TextView settingTextView;
 
+    @BindView(R.id.text_save)
+    TextView saveText;
+    @BindView(R.id.image_baby_info_select)
+    ImageView babyinfoSelect;
+    @BindView(R.id.image_baby_setting_select)
+    ImageView babySettingSelect;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,12 +97,18 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
                         babyInfoTextView.getPaint().setFakeBoldText(true);
                         settingTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
                         settingTextView.getPaint().setFakeBoldText(false);
+                        saveText.setVisibility(View.VISIBLE);
+                        babyinfoSelect.setVisibility(View.VISIBLE);
+                        babySettingSelect.setVisibility(View.GONE);
                         break;
                     case 1:
                         babyInfoTextView.setTextColor(getResources().getColor(R.color.toolbar_text_uncheck));
                         babyInfoTextView.getPaint().setFakeBoldText(false);
                         settingTextView.setTextColor(getResources().getColor(R.color.toolbar_text_check));
                         settingTextView.getPaint().setFakeBoldText(true);
+                        saveText.setVisibility(View.GONE);
+                        babySettingSelect.setVisibility(View.VISIBLE);
+                        babyinfoSelect.setVisibility(View.GONE);
                         break;
                     default:
                         break;
@@ -103,6 +120,15 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
 
             }
         });
+    }
+
+    @OnClick(R.id.text_save)
+    void saveBabyInfo(){
+        childUpdate();
+        userIcon();
+        DbController.getInstance().updateBabyInfoData(BaseApplication.getInstance().getBabyInfo());
+        DbController.getInstance().updateSettingData(BaseApplication.getInstance().getSettingInfo());
+        finish();
     }
 
     @Override
@@ -142,43 +168,49 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
 //        BaseApplication.getInstace().setSettingsBean(DbController.getInstance().querySettingData());
     }
     private void saveData(){
-        childUpdate();
-        userIcon();
-        DbController.getInstance().updateBabyInfoData(BaseApplication.getInstance().getBabyInfo());
+
         DbController.getInstance().updateSettingData(BaseApplication.getInstance().getSettingInfo());
+        BabyInfo info1 = BaseApplication.getInstance().getBabyInfo();
+        BabyInfo info2 = DbController.getInstance().queryBabyInfoData();
+        if (!info1.equals(info2)){
+            showPrompt();
+        }
     }
-//    private void showPrompt() {
-//        final Dialog dialog = new Dialog(this,R.style.MyDialog);
-//        dialog.setContentView(R.layout.dialog_hint2);
-//        TextView textOK = dialog.findViewById(R.id.text_ok);
-//        TextView textMeassge = dialog.findViewById(R.id.text_message);
-//        textMeassge.setText("您编辑的信息尚未保存,\n确认离开?");
-//        textOK.setTextColor(getResources().getColor(R.color.blue));
-//        textOK.setText("确定");
-//        textOK.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (dialog != null) {
-//                    dialog.dismiss();
-//                }
-//                BaseApplication.getInstance().setBabyInfo(DbController.getInstance().queryBabyInfoData());
-//                BaseApplication.getInstance().setSettingInfo(DbController.getInstance().querySettingData());
-//                finish();
-//            }
-//        });
-//        TextView textCancel = dialog.findViewById(R.id.text_cancel);
-//        textCancel.setText("取消");
-//        textCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (dialog != null) {
-//                    dialog.dismiss();
-//                }
-//            }
-//        });
-//
-//        dialog.show();
-//    }
+    private void showPrompt() {
+        final Dialog dialog = new Dialog(this,R.style.MyDialog);
+        dialog.setContentView(R.layout.dialog_hint2);
+        TextView textOK = dialog.findViewById(R.id.text_ok);
+        TextView textMeassge = dialog.findViewById(R.id.text_message);
+        textMeassge.setText("您的资料已修改尚未保存");
+        textOK.setTextColor(getResources().getColor(R.color.blue));
+        textOK.setText("保存");
+        textOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                childUpdate();
+                userIcon();
+                DbController.getInstance().updateBabyInfoData(BaseApplication.getInstance().getBabyInfo());
+                finish();
+            }
+        });
+        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+        textCancel.setText("取消");
+        textCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                BaseApplication.getInstance().setBabyInfo(DbController.getInstance().queryBabyInfoData());
+                finish();
+            }
+        });
+
+        dialog.show();
+    }
 
 //    @Override
 //    public void settingComplete(String imageUrlPath) {

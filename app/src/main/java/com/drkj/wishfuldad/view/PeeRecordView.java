@@ -3,9 +3,12 @@ package com.drkj.wishfuldad.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -36,30 +39,28 @@ public class PeeRecordView extends View {
     private int scrollx;
     private int scrolly;
     private boolean flag = true;
+    private List<Integer> textX = new ArrayList<>();
+    private List<Integer> textY = new ArrayList<>();
+
+    private int tempMoveX = 0;
+    private int tempMoveY = 0;
     public PeeRecordView(Context context, PeeRecordLayout layout) {
         super(context);
         this.layout = layout;
-        initdatas();
+        initdatas(context);
     }
 
     public PeeRecordView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initdatas();
+        initdatas(context);
     }
 
     public PeeRecordView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initdatas();
+        initdatas(context);
     }
 
-    private void initdatas() {
-//        days.add("09-01");
-//        days.add("09-02");
-//        days.add("09-03");
-//        days.add("09-04");
-//        days.add("09-05");
-//        days.add("09-06");
-//        days.add("09-07");
+    private void initdatas(Context context) {
 
         times.add("0:00");
         times.add("1:00");
@@ -98,15 +99,13 @@ public class PeeRecordView extends View {
         textPaint.setTextSize(30);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setColor(getResources().getColor(R.color.white));
-//        for (int i=10;i>0;i--){
+
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-//            canvas.drawText(i+"",50,(10-i)*50+100,paint);
-//        }
         int h = canvas.getHeight() / 10;
         int w = canvas.getWidth() / 5;
         int height = canvas.getHeight();
@@ -125,6 +124,8 @@ public class PeeRecordView extends View {
                     canvas.drawText(time, w / 2 + j * w, (ho) * h  + textH/2 + h / 60 * min-5, textPaint);
                     scrollx = w / 2 + j * w-canvas.getWidth()/2;
                     scrolly = (int) (ho * h + 15 + textH + h / 60 * min) - height / 2;
+                    textX.add(w / 2 + j * w);
+                    textY.add((int) (ho * h + 15 + textH + h / 60 * min));
                 }
             }
         }
@@ -134,6 +135,7 @@ public class PeeRecordView extends View {
                 layout.scroll(scrollx, scrolly);
         }
     }
+
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -160,6 +162,8 @@ public class PeeRecordView extends View {
         if (y > mMaxPositionY) {
             y = mMaxPositionY;
         }
+        tempMoveX = x;
+        tempMoveY = y;
         if (x != getScrollX() || y != getScrollY()) {
             super.scrollTo(x, y);
         }
@@ -181,4 +185,29 @@ public class PeeRecordView extends View {
         return super.dispatchTouchEvent(ev);
     }
 
+    public List<Integer> getTextX() {
+        return textX;
+    }
+
+    public List<Integer> getTextY() {
+        return textY;
+    }
+
+
+    public void onDoubleTap(MotionEvent event){
+        int x1 = (int) event.getX()+tempMoveX-getWidth()/5;
+        int y1 = (int) event.getY()+tempMoveY-getHeight()/10;
+        double distance = -1;
+        int tempX = 0;
+        int tempY = 0;
+        for (int i = 0; i < textX.size(); i++) {
+            double tempDis = Math.sqrt(Math.abs(x1 - textX.get(i)) * Math.abs(x1 - textX.get(i)) + Math.abs(y1 - textY.get(i)) * Math.abs(y1 - textY.get(i)));
+            if (distance == -1 || distance > tempDis) {
+                distance = tempDis;
+                tempX = textX.get(i);
+                tempY = textY.get(i);
+            }
+        }
+        scrollTo(tempX - getWidth() / 2, tempY - getHeight() / 2);
+    }
 }

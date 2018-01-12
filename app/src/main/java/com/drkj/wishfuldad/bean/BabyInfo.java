@@ -1,5 +1,7 @@
 package com.drkj.wishfuldad.bean;
 
+import android.text.TextUtils;
+
 /**
  * Created by ganlong on 2017/12/25.
  */
@@ -95,5 +97,31 @@ public class BabyInfo {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj==null){
+            return false;
+        }
+        if(this==obj){
+            return true;
+        }
+        if(obj instanceof BabyInfo){
+            BabyInfo info=(BabyInfo)obj;
+            if(TextUtils.equals(info.name,this.name)&&info.age==this.age&&info.sex==this.sex
+                    && TextUtils.equals(info.headImage,this.headImage)
+                    &&info.birthDayYear==this.birthDayYear
+                    &&info.birthDayMonth==this.birthDayMonth
+                    &&info.birthDayDay==this.birthDayDay
+                    &&info.bloodType==this.bloodType
+                    &&info.weight==this.weight
+                    &&info.height==this.height){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        return false;
     }
 }

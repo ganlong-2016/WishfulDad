@@ -133,36 +133,9 @@ public class BaseActivity extends AppCompatActivity {
         activityStack.clear();
     }
 
-    public boolean isApplicationBroughtToBackground() {
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
-        if (!tasks.isEmpty()) {
-            ComponentName topActivity = tasks.get(0).topActivity;
-            if (!topActivity.getPackageName().equals(getPackageName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isForeground(Context context, String className) {
-        if (context == null || TextUtils.isEmpty(className)) {
-            return false;
-        }
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> list = am.getRunningTasks(1);
-        if (list != null && list.size() > 0) {
-            ComponentName cpn = list.get(0).topActivity;
-            if (className.equals(cpn.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected void userUpdate(){
         ServerNetClient.getInstance().getApi().userUpdate(
-                SpUtil.getToken(this,"token"),
+                SpUtil.getString(this,"token"),
                 BaseApplication.getInstance().getYourInfo().getName(),
                 BaseApplication.getInstance().getYourInfo().getAge(),
                 BaseApplication.getInstance().getYourInfo().getRole()
@@ -182,7 +155,7 @@ public class BaseActivity extends AppCompatActivity {
     }
     protected void childUpdate(){
         ServerNetClient.getInstance().getApi().childUpdate(
-                SpUtil.getToken(this,"token"),
+                SpUtil.getString(this,"token"),
                 BaseApplication.getInstance().getBabyInfo().getName(),
                 BaseApplication.getInstance().getBabyInfo().getAge(),
                 BaseApplication.getInstance().getBabyInfo().getSex(),
@@ -207,7 +180,7 @@ public class BaseActivity extends AppCompatActivity {
         File file = new File(BaseApplication.getInstance().getBabyInfo().getHeadImage());
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)//表单类型
-                .addFormDataPart("token",  SpUtil.getToken(this,"token"));
+                .addFormDataPart("token",  SpUtil.getString(this,"token"));
         RequestBody imageBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         builder.addFormDataPart("photo", file.getName(), imageBody);
         List<MultipartBody.Part> parts = builder.build().parts();

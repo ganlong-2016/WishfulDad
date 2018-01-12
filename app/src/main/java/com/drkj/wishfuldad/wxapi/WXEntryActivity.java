@@ -1,6 +1,10 @@
 package com.drkj.wishfuldad.wxapi;
 
+import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -10,6 +14,7 @@ import android.widget.Toast;
 import com.drkj.wishfuldad.BaseActivity;
 import com.drkj.wishfuldad.BaseApplication;
 import com.drkj.wishfuldad.R;
+import com.drkj.wishfuldad.activity.CardActivity;
 import com.drkj.wishfuldad.activity.SetYourAccountActivity;
 import com.drkj.wishfuldad.activity.SetYourInfoActivity;
 import com.drkj.wishfuldad.activity.SplashActivity;
@@ -17,9 +22,11 @@ import com.drkj.wishfuldad.bean.LoginResultBean;
 import com.drkj.wishfuldad.bean.WechatAccessTokenResultBean;
 import com.drkj.wishfuldad.bean.WechatRefreshTokenResultBean;
 import com.drkj.wishfuldad.bean.WechatUserInfoResultBean;
+import com.drkj.wishfuldad.db.DbController;
 import com.drkj.wishfuldad.net.ConstantUrl;
 import com.drkj.wishfuldad.net.ServerNetClient;
 import com.drkj.wishfuldad.net.WeChatNetClient;
+import com.drkj.wishfuldad.util.FileUtil;
 import com.drkj.wishfuldad.util.SpUtil;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
@@ -35,6 +42,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
 
 public class WXEntryActivity extends BaseActivity implements IWXAPIEventHandler {
 
@@ -72,24 +80,28 @@ public class WXEntryActivity extends BaseActivity implements IWXAPIEventHandler 
     @OnClick(R.id.button_register)
     void register() {
         MobclickAgent.onEvent(this, "phonelogin");
-        if (TextUtils.isEmpty(SpUtil.getToken(this, "token"))) {
-            startActivity(new Intent(this, SetYourInfoActivity.class));
-        } else {
+//        if (TextUtils.isEmpty(SpUtil.getToken(this, "token"))) {
+//            startActivity(new Intent(this, SetYourInfoActivity.class));
+//        } else {
             startActivity(new Intent(this,SetYourAccountActivity.class));
-        }
+//        }
     }
 
     // 微信发送请求到第三方应用时，会回调到该方法
     @Override
     public void onReq(BaseReq req) {
     }
-
+    ProgressDialog dialog;
     // 第三方应用发送到微信的请求处理后的响应结果，会回调到该方法
     //app发送消息给微信，处理返回消息的回调
     @Override
     public void onResp(BaseResp resp) {
 //        LogUtils.sf(resp.errStr);
 //        LogUtils.sf("错误码 : " + resp.errCode + "");
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("正在登录中");
+        dialog.setCancelable(false);
+        dialog.show();
         Log.i("ganlong", "onResp: " + resp.errCode + "," + resp.errStr);
         switch (resp.errCode) {
 
@@ -171,13 +183,69 @@ public class WXEntryActivity extends BaseActivity implements IWXAPIEventHandler 
                         if (loginResultBean.getStatus() == 1) {
 //                            SpUtil.putString(WXEntryActivity.this, "token", loginResultBean.getData().getToken());
                             BaseApplication.getInstance().setWechatUserInfoResultBean(wechatUserInfoResultBean);
-                            startActivity(new Intent(WXEntryActivity.this, SetYourInfoActivity.class));
+//                            startActivity(new Intent(WXEntryActivity.this, SetYourAccountActivity.class));
+
+
+                            if (!TextUtils.isEmpty(loginResultBean.getData().getName()))
+                                initData(loginResultBean);
+                            else {
+                                BaseApplication.getInstance().setToken(loginResultBean.getData().getToken());
+                                startActivity(new Intent(WXEntryActivity.this, SetYourInfoActivity.class));
+                            }
+
                         }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
 
+                    }
+                });
+    }
+
+    private void initData(LoginResultBean loginResultBean) {
+        BaseApplication.getInstance().getYourInfo().setName(loginResultBean.getData().getName());
+        BaseApplication.getInstance().getYourInfo().setAge(loginResultBean.getData().getAge());
+        BaseApplication.getInstance().getYourInfo().setRole(loginResultBean.getData().getRole());
+        BaseApplication.getInstance().getBabyInfo().setName(loginResultBean.getData().getCname());
+        BaseApplication.getInstance().getBabyInfo().setAge(loginResultBean.getData().getCage());
+        BaseApplication.getInstance().getBabyInfo().setSex(loginResultBean.getData().getCsex());
+        SpUtil.putString(WXEntryActivity.this, "token", loginResultBean.getData().getToken());
+        ServerNetClient.getInstance().getApi()
+                .downloadPicFromNet("http://47.100.32.240" + loginResultBean.getData().getCphoto())
+                .subscribeOn(Schedulers.newThread())
+                .map(new Function<ResponseBody, Bitmap>() {
+                    @Override
+                    public Bitmap apply(ResponseBody responseBody) throws Exception {
+                        Bitmap bitmap = BitmapFactory.decodeStream(responseBody.byteStream());
+                        return bitmap;
+                    }
+                }).map(new Function<Bitmap, String>() {
+            @Override
+            public String apply(Bitmap bitmap) throws Exception {
+                if (!checkMission(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    return null;
+                String imagePath = FileUtil.saveFile(WXEntryActivity.this, "temphead.jpg", bitmap);
+                return imagePath;
+            }
+        })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String imagePath) throws Exception {
+                        if (!TextUtils.isEmpty(imagePath)) {
+                            BaseApplication.getInstance().getBabyInfo().setHeadImage(imagePath);
+                            DbController.getInstance().updateBabyInfoData(BaseApplication.getInstance().getBabyInfo());
+                            DbController.getInstance().updateYourInfoData(BaseApplication.getInstance().getYourInfo());
+                            finishAllActivity();
+                            dialog.dismiss();
+                            startActivity(new Intent(WXEntryActivity.this, CardActivity.class));
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
                     }
                 });
     }

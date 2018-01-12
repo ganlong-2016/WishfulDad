@@ -29,7 +29,7 @@ public class SpUtil {
         editor.apply();
     }
 
-    public static String getToken(Context context,String key){
+    public static String getString(Context context,String key){
         SharedPreferences sp=context.getSharedPreferences(context.getPackageName(), 0);
         String value = sp.getString(key,"");
         return value;
@@ -43,6 +43,18 @@ public class SpUtil {
     public static int getInt(Context context,String key){
         SharedPreferences sp=context.getSharedPreferences(context.getPackageName(), 0);
         int value = sp.getInt(key,0);
+        return value;
+    }
+
+    public static void putBoolean(Context context,String key,boolean value){
+        SharedPreferences settings= context.getSharedPreferences(context.getPackageName(), 0);
+        SharedPreferences.Editor editor=settings.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+    public static boolean getBoolen(Context context,String key){
+        SharedPreferences sp=context.getSharedPreferences(context.getPackageName(), 0);
+        boolean value = sp.getBoolean(key,false);
         return value;
     }
 }

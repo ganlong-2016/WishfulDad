@@ -50,9 +50,9 @@ public class SplashActivity extends BaseActivity {
             }
         };
         timer.start();
-        if (!TextUtils.isEmpty(SpUtil.getToken(this, "token"))) {
+        if (!TextUtils.isEmpty(SpUtil.getString(this, "token"))) {
             ServerNetClient.getInstance().getApi()
-                    .autoLogin(SpUtil.getToken(this, "token"))
+                    .autoLogin(SpUtil.getString(this, "token"))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<LoginResultBean>() {

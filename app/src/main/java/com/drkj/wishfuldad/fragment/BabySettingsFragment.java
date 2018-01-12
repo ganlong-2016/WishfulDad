@@ -1,41 +1,38 @@
 package com.drkj.wishfuldad.fragment;
 
 
-import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.TextView;
 
-import com.drkj.wishfuldad.BaseApplication;
+import com.drkj.wishfuldad.BaseActivity;
 import com.drkj.wishfuldad.R;
 import com.drkj.wishfuldad.activity.HelpActivity;
 import com.drkj.wishfuldad.activity.RepErrorActivity;
 import com.drkj.wishfuldad.activity.SetAlertActivity;
 import com.drkj.wishfuldad.activity.SetHrActivity;
-import com.drkj.wishfuldad.listener.SettingBabyInfoListener;
+import com.drkj.wishfuldad.util.SpUtil;
+import com.drkj.wishfuldad.wxapi.WXEntryActivity;
 import com.umeng.analytics.MobclickAgent;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class BabySettingsFragment extends Fragment implements View.OnClickListener {
 
-    private Activity activity;
+    private BaseActivity activity;
     private TextView textView1;
     private TextView textView2;
     private TextView textView3;
     private TextView textView4;
+    private Button loginout;
 //    private ImageView headImageView;
 //    private TextView babyName;
 //    SettingBabyInfoListener listener;
@@ -55,16 +52,18 @@ public class BabySettingsFragment extends Fragment implements View.OnClickListen
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        activity = getActivity();
+        activity = (BaseActivity) getActivity();
         textView1 = activity.findViewById(R.id.village_name_textview1);
         textView2 = activity.findViewById(R.id.village_name_textview2);
         textView3 = activity.findViewById(R.id.village_name_textview3);
         textView4 = activity.findViewById(R.id.village_name_textview4);
+        loginout = activity.findViewById(R.id.button_login_out);
 //        babyName = activity.findViewById(R.id.text_setting_baby_name);
         textView1.setOnClickListener(this);
         textView2.setOnClickListener(this);
         textView3.setOnClickListener(this);
         textView4.setOnClickListener(this);
+        loginout.setOnClickListener(this);
 
 //        headImageView = activity.findViewById(R.id.baby_head_image_view);
 //        setBabyName(BaseApplication.getInstance().getBabyInfo().getName());
@@ -102,11 +101,43 @@ public class BabySettingsFragment extends Fragment implements View.OnClickListen
                 MobclickAgent.onEvent(getContext(), "questionChat");
                 startActivity(new Intent(activity, RepErrorActivity.class));
                 break;
+            case R.id.button_login_out:
+                showLoginOutDialog();
+
+                break;
             default:
                 break;
         }
     }
-
+    private void showLoginOutDialog() {
+        final Dialog dialog = new Dialog(activity, R.style.MyDialog);
+        dialog.setContentView(R.layout.dialog_login_out_hint);
+        TextView textOK = dialog.findViewById(R.id.text_ok);
+        textOK.setTextColor(getResources().getColor(R.color.blue));
+        textOK.setText("确定");
+        textOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                activity.finishAllActivity();
+                SpUtil.putString(activity,"token","");
+                startActivity(new Intent(activity, WXEntryActivity.class));
+            }
+        });
+        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+        textCancel.setText("取消");
+        textCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        dialog.show();
+    }
 //    public void setBabyInfo(String imageUrlPath) {
 //        if (headImageView != null) {
 //            try {
