@@ -209,5 +209,6 @@ public class PeeRecordView extends View {
             }
         }
         scrollTo(tempX - getWidth() / 2, tempY - getHeight() / 2);
+        layout.scrollOther(tempX - getWidth() / 2, tempY - getHeight() / 2);
     }
 }

@@ -170,7 +170,10 @@ public class PeeRecordLayout extends ViewGroup implements View.OnTouchListener {
         recordView.scrollTo(x, y);
         timeView.scrollTo(0, y);
     }
-
+    public void scrollOther(int x, int y) {
+        dayView.scrollTo(x, 0);
+        timeView.scrollTo(0, y);
+    }
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if (gestureDetector!=null){
