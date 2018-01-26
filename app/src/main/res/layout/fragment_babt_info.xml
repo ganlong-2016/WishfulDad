@@ -13,9 +13,9 @@
             android:id="@+id/imageView2"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="86dp"
+            android:layout_marginEnd="86dp"
             android:layout_marginTop="20dp"
             android:src="@drawable/ic_oval_blue" />
 
@@ -24,7 +24,7 @@
             android:layout_width="140dp"
             android:layout_height="140dp"
             android:layout_alignTop="@+id/imageView2"
-            android:layout_toLeftOf="@+id/imageView2"
+            android:layout_toStartOf="@+id/imageView2"
             android:src="@drawable/ic_oval_red" />
 
         <com.drkj.wishfuldad.view.RoundImageView
@@ -40,9 +40,9 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginBottom="13dp"
-            android:layout_marginRight="72dp"
+            android:layout_marginEnd="72dp"
             android:background="@drawable/ic_sex_background"
             android:visibility="visible">
 
@@ -86,7 +86,7 @@
         android:text="请选择出生日期"
         android:textColor="#333"
         android:textSize="15sp"
-        android:drawableRight="@drawable/ic_arror"/>
+        android:drawableEnd="@drawable/ic_arror"/>
 
     <RelativeLayout
         android:layout_width="220dp"

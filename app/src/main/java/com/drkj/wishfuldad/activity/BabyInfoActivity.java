@@ -135,6 +135,7 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             saveData();
+            return false;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -144,7 +145,6 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.imageView_back:
                 saveData();
-                finish();
                 break;
             case R.id.text_baby_info:
 
@@ -174,6 +174,8 @@ public class BabyInfoActivity extends BaseActivity implements View.OnClickListen
         BabyInfo info2 = DbController.getInstance().queryBabyInfoData();
         if (!info1.equals(info2)){
             showPrompt();
+        }else{
+            finish();
         }
     }
     private void showPrompt() {

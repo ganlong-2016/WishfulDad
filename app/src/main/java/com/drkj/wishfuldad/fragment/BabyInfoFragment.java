@@ -176,9 +176,9 @@ public class BabyInfoFragment extends Fragment implements View.OnClickListener {
         Calendar dateAndTime = Calendar.getInstance();
         DatePickerDialog dateDlg = new DatePickerDialog(activity,
                 dateSetListener,
-                dateAndTime.get(Calendar.YEAR)-18,
-                dateAndTime.get(Calendar.MONTH),
-                dateAndTime.get(Calendar.DAY_OF_MONTH));
+                BaseApplication.getInstance().getBabyInfo().getBirthDayYear(),
+                BaseApplication.getInstance().getBabyInfo().getBirthDayMonth(),
+                BaseApplication.getInstance().getBabyInfo().getBirthDayDay());
         DatePicker picker = dateDlg.getDatePicker();
         picker.setMaxDate(dateAndTime.getTimeInMillis());
         dateAndTime.set(Calendar.YEAR,dateAndTime.get(Calendar.YEAR)-18);

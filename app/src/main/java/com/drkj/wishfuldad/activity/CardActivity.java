@@ -13,6 +13,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -138,6 +139,9 @@ public class CardActivity extends BaseActivity {
 
     private boolean isManualClose = false;
 
+    private boolean isAutoConnect = false;
+
+    private boolean isWindowShow = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -432,7 +436,7 @@ public class CardActivity extends BaseActivity {
         super.onDestroy();
         if (timer != null)
             timer.cancel();
-        if (timer2!=null)
+        if (timer2 != null)
             timer2.cancel();
     }
 
@@ -536,7 +540,7 @@ public class CardActivity extends BaseActivity {
             case R.id.switch_tibei:
                 MobclickAgent.onEvent(this, "tickSwitch");
                 tibei = isChecked;
-                if (isChecked && !SpUtil.getBoolen(this,"tibeihint")) {
+                if (isChecked && !SpUtil.getBoolen(this, "tibeihint")) {
 
                     showtibeiDialog();
                 }
@@ -544,7 +548,7 @@ public class CardActivity extends BaseActivity {
             case R.id.switch_liju:
                 MobclickAgent.onEvent(this, "distanceSwitch");
                 distance = isChecked;
-                if (isChecked && !SpUtil.getBoolen(this,"distancehint")) {
+                if (isChecked && !SpUtil.getBoolen(this, "distancehint")) {
 
                     showDistanceDialog();
                 }
@@ -581,8 +585,13 @@ public class CardActivity extends BaseActivity {
                 }
                 progressDialog = new ProgressDialog(this);
                 progressDialog.setMessage("蓝牙设备搜索中...");
-                progressDialog.setCancelable(false);
                 progressDialog.show();
+                progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        BleManager.getInstance().cancelScan();
+                    }
+                });
 
                 BleManager.getInstance().scan(new BleScanCallback() {
                     @Override
@@ -625,7 +634,7 @@ public class CardActivity extends BaseActivity {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
-                SpUtil.putBoolean(CardActivity.this,"tibeihint",true);
+                SpUtil.putBoolean(CardActivity.this, "tibeihint", true);
             }
         });
         TextView textCancel = dialog.findViewById(R.id.text_cancel);
@@ -654,7 +663,7 @@ public class CardActivity extends BaseActivity {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
-                SpUtil.putBoolean(CardActivity.this,"distancehint",true);
+                SpUtil.putBoolean(CardActivity.this, "distancehint", true);
             }
         });
         TextView textCancel = dialog.findViewById(R.id.text_cancel);
@@ -748,6 +757,7 @@ public class CardActivity extends BaseActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     MobclickAgent.onEvent(CardActivity.this, "bluetoothChoose");
+
                     progressDialog = new ProgressDialog(CardActivity.this);
                     progressDialog.setMessage("设备连接中...");
                     progressDialog.show();
@@ -784,11 +794,11 @@ public class CardActivity extends BaseActivity {
                         double d = Math.pow(10, power);
                         BigDecimal b = new BigDecimal(d);
                         double f1 = b.setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
-                        if (f1<=5){
+                        if (f1 <= 5) {
                             distanceText.setText("近");
-                        }else if (f1<=10){
+                        } else if (f1 <= 10) {
                             distanceText.setText("中");
-                        }else if (f1>10){
+                        } else if (f1 > 10) {
                             distanceText.setText("远");
                         }
                         if (iRssi >= 85) {
@@ -796,7 +806,7 @@ public class CardActivity extends BaseActivity {
                         } else {
                             num = 0;
                         }
-                        if (num >= 3) {
+                        if (num >= 3&&!isWindowShow) {
                             num = 0;
                             notice();
                             noticeDistance();
@@ -822,7 +832,7 @@ public class CardActivity extends BaseActivity {
 
         @Override
         public void onConnectSuccess(final BleDevice bleDevice, BluetoothGatt gatt, int status) {
-            if (timer2!=null)
+            if (timer2 != null)
                 timer2.cancel();
             mDevice = bleDevice;
             progressDialog.dismiss();
@@ -845,7 +855,8 @@ public class CardActivity extends BaseActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            write(bleDevice, SampleGattAttributes.XXB_XX_OK);
+
+//            write(bleDevice, SampleGattAttributes.XXB_XX_OK);
             int a = BaseApplication.getInstance().getSettingInfo().getWeatherType();
             switch (a) {
                 case 0:
@@ -871,25 +882,31 @@ public class CardActivity extends BaseActivity {
                 }
             };
             timer.schedule(task, 0, 5000);
+            if (!isAutoConnect) {
+                showOKdialog(bleDevice);
+            }
         }
 
         @Override
         public void onDisConnected(boolean isActiveDisConnected, final BleDevice device, BluetoothGatt gatt, int status) {
             mBluetooth.setImageResource(R.drawable.ic_bluetooth_unconnect);
             timer.cancel();
-            if (isManualClose)
+            if (isManualClose) {
                 clearData();
-            else {
-                timer2 = new CountDownTimer(600000,10000) {
+
+                isAutoConnect = false;
+            } else {
+                timer2 = new CountDownTimer(600000, 10000) {
                     @Override
                     public void onTick(long millisUntilFinished) {
+                        isAutoConnect = true;
                         connect(device);
                         Log.i(TAG, "onTick: 自动重连");
                     }
 
                     @Override
                     public void onFinish() {
-
+                        isAutoConnect = false;
                     }
                 };
                 timer2.start();
@@ -897,9 +914,42 @@ public class CardActivity extends BaseActivity {
 
         }
     };
+
+    private void showOKdialog(final BleDevice bleDevice) {
+        final Dialog dialog = new Dialog(this, R.style.MyDialog);
+        dialog.setContentView(R.layout.dialog_hint2);
+        TextView textOK = dialog.findViewById(R.id.text_ok);
+        TextView textMeassge = dialog.findViewById(R.id.text_message);
+        textMeassge.setText("请确认奶爸听差已正确粘贴于\n宝宝的纸尿裤上");
+        textOK.setTextColor(getResources().getColor(R.color.blue));
+        textOK.setText("确定");
+        textOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                write(bleDevice, SampleGattAttributes.XXB_XX_OK);
+
+            }
+        });
+        TextView textCancel = dialog.findViewById(R.id.text_cancel);
+        textCancel.setText("不是新尿布");
+        textCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
     private void connect(final BleDevice device) {
         if (!BleManager.getInstance().isConnected(device)) {
-            BleManager.getInstance().connect(device,callback);
+            BleManager.getInstance().connect(device, callback);
         }
 
     }
@@ -1054,6 +1104,13 @@ public class CardActivity extends BaseActivity {
             }
         });
         dialog.show();
+        isWindowShow = true;
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isWindowShow = false;
+            }
+        });
     }
 
     private void noticePee() {
@@ -1083,7 +1140,7 @@ public class CardActivity extends BaseActivity {
             }
         });
         TextView textCancel = dialog.findViewById(R.id.text_cancel);
-        textCancel.setText("暂不更换");
+        textCancel.setText("继续使用");
         textCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1094,7 +1151,12 @@ public class CardActivity extends BaseActivity {
         });
 
         dialog.show();
-
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isWindowShow = false;
+            }
+        });
     }
 
     private void noticeDistance() {
@@ -1119,7 +1181,6 @@ public class CardActivity extends BaseActivity {
             }
         });
         dialog.show();
-
     }
 
     private void showDisConnectDialog(final BleDevice device) {

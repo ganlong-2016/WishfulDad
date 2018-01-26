@@ -39,7 +39,7 @@ public class DbConstant {
     public static final String INSERT_DEFAULT_SETTING =
             "insert into "+SETTING_TABLE_NAME+
                     "(isVibrate,alarmSound,weather) " +
-                    "values (0,0,0)";
+                    "values (0,1,0)";
     public static final String YOUR_INFO_TABLE_NAME = "your_info";
 
     public static final String CREATE_YOUR_INFO_TABLE =
