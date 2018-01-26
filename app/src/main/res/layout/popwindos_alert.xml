@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_corner_dialog"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/pee_alert_layout"
+            android:layout_width="180dp"
+            android:layout_height="130dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/pee_data_imageview"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="13dp"
+                android:src="@drawable/ic_niao3"
+                android:background="@color/transparent"/>
+            <ImageView
+                android:id="@+id/pee_baby_imageview"
+                android:layout_width="70dp"
+                android:layout_height="100dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:background="@color/transparent"
+                android:src="@drawable/ic_xiao_ha" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/kick_alert_layout"
+            android:layout_width="180dp"
+            android:layout_height="130dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/beizi_imageview"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="15dp"
+                android:src="@drawable/ic_bei_zi"
+                android:background="@color/transparent"/>
+
+            <ImageView
+                android:id="@+id/kick_baby_imageview"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/ic_xiao_hai2"
+                android:background="@color/transparent"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/distance_alert_layout"
+            android:layout_width="180dp"
+            android:layout_height="130dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/chuang_imageview"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_chuang"
+                android:background="@color/transparent"/>
+
+            <ImageView
+                android:id="@+id/dist_bay_imageview"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="11dp"
+                android:src="@drawable/ic_baby3"
+                android:background="@color/transparent"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/text_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="尿尿了！"
+            android:textSize="14sp"
+            android:textColor="#333" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="10dp"
+            android:src="#999" />
+
+        <RelativeLayout
+            android:id="@+id/pee_alert_confirm_layout"
+            android:layout_width="match_parent"
+            android:layout_height="46dp">
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="1dp"
+                android:layout_height="30dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="#999" />
+
+            <TextView
+                android:id="@+id/text_ok"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="18sp"
+                android:layout_marginLeft="40dp"
+                android:gravity="center"
+                android:text="更换"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#36f" />
+
+            <TextView
+                android:id="@+id/text_cancel"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="40dp"
+                android:gravity="center"
+                android:text="暂不更换"
+                android:textColor="#36f"
+                android:textSize="18sp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/kick_alert_confirm_layout"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/confirm_textview"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="好的"
+                android:textColor="#36f"
+                android:textSize="18sp"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+</LinearLayout>
+
+
+
